@@ -1,0 +1,68 @@
+{:deps {clj-http {:mvn/version "3.10.1"}
+        com.bhauman/figwheel-main {:mvn/version "0.2.9"}
+        com.cemerick/url {:mvn/version "0.1.1"}
+        com.cognitect/transit-clj {:mvn/version "1.0.324"}
+        com.cognitect/transit-cljs {:mvn/version "0.8.264"}
+        ;; funnel all logging to timbre
+        com.fzakaria/slf4j-timbre {:mvn/version "0.3.19"}
+        com.rpl/specter {:mvn/version "1.1.3"}
+        com.taoensso/timbre {:mvn/version "4.11.0-alpha1"}
+        danlentz/clj-uuid {:mvn/version "0.1.9"}
+        hashp {:mvn/version "0.2.0"}
+        hiccup {:mvn/version "1.0.5"}
+        integrant {:mvn/version "0.8.0"}
+        integrant/repl {:mvn/version "0.3.1"}
+        juxt/crux-core {:mvn/version "20.08-1.10.1-beta"}
+        juxt/crux-lmdb {:mvn/version "20.08-1.10.1-alpha"}
+        kee-frame {:mvn/version "0.4.0" :exclusions [metosin/reitit-core]}
+        metosin/muuntaja {:mvn/version "0.6.7"}
+        metosin/reitit {:mvn/version "0.5.5"}
+        metosin/ring-http-response {:mvn/version "0.9.1"}
+        miracle-save {:mvn/version "0.0.1"}
+        nrepl/nrepl {:mvn/version "0.7.0"}
+        org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/clojurescript {:mvn/version "1.10.773"}
+        ;; funnel all logging to timbre
+        org.slf4j/log4j-over-slf4j {:mvn/version "1.7.30"}
+        org.slf4j/jul-to-slf4j {:mvn/version "1.7.30"}
+        org.slf4j/jcl-over-slf4j {:mvn/version "1.7.30"}
+        re-frame {:mvn/version "1.0.0"}
+        reagent {:mvn/version "1.0.0-alpha2"}
+        ring/ring-anti-forgery {:mvn/version "1.3.0"}
+        ring/ring-core {:mvn/version "1.8.1"}
+        ring/ring-jetty-adapter {:mvn/version "1.8.1"}}
+ :paths ["src/clj" "src/cljc" "src/cljs" "resources"]
+ :aliases
+ {:dev
+  {:extra-paths ["alias/dev/src/clj"
+                 "alias/dev/src/cljc"
+                 "alias/dev/src/cljs"
+                 "alias/dev/resources"
+                 "alias/dev/target"]
+   :extra-deps {binaryage/devtools {:mvn/version "1.0.0"}}}
+  :prod
+  {:extra-paths ["alias/prod/src/clj"
+                 "alias/prod/src/cljc"
+                 "alias/prod/src/cljs"
+                 "alias/prod/resources"
+                 "alias/prod/target"]}
+
+  :hotload-deps                         ; unofficial, experimental
+  {:extra-deps {org.clojure/tools.deps.alpha
+                {:git/url "https://github.com/clojure/tools.deps.alpha"
+                 :sha     "19d197ab221d37db750423eb970880cb87a91100"}}
+   ;; DynamicClassLoader required for add-lib to work
+   :main-opts  ["-e" "(->>(Thread/currentThread)(.getContextClassLoader)(clojure.lang.DynamicClassLoader.)(.setContextClassLoader,(Thread/currentThread)))"]}
+  :idiom-check
+  {:extra-deps {tvaughan/kibit-runner {:mvn/version "0.2.3"}}
+   :main-opts  ["-m" "kibit-runner.cmdline" "alias" "src"]}
+  :cider-nrepl
+  {:extra-deps {cider/cider-nrepl {:mvn/version "0.25.0"}
+                refactor-nrepl {:mvn/version "2.5.0"}}}
+  :reply
+  {:extra-deps {reply {:mvn/version "0.4.4"}}
+   :main-opts ["-m" "reply.main" "--attach" "1337"]}
+  :test
+  {:extra-paths ["test/clj" "test/cljs"]
+   :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0-612"}}
+   :main-opts   ["-m" "kaocha.runner"]}}}

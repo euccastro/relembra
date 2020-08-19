@@ -1,0 +1,24 @@
+* as root, create and set up relembra user
+** apt update e upgrade
+** install packages
+   apt install vim fail2ban ufw nginx certbot python-certbot-nginx
+** add user relembra
+   adduser relembra
+** set as passwordless sudoer
+   usermod -a -G sudo relembra
+   visudo
+   change
+       %sudo   ALL=(ALL:ALL) ALL
+   to
+       %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+* as relembra disable password auth
+  ssh-copy-id relembra@che
+  sudo vim /etc/ssh/sshd_config
+  change to
+      PasswordAuthentication no
+      UsePam no
+  sudo systemctl reload ssh
+* obter certificado
+  sudo certbot --nginx
+* install clj
+  https://clojure.org/guides/getting_started
