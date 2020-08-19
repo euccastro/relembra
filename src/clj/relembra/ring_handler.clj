@@ -34,7 +34,7 @@
       (content-type "text/html; charset=utf-8")))
 
 
-(defn- handler []
+(defn- handler [crux-node]
   (rring/ring-handler
    (rring/router
     [["/test" {:get (constantly {:status 200
@@ -48,8 +48,8 @@
 
 
 (defmethod ig/init-key ::handler
-  [_ _]
-  (-> (handler)
+  [_ {:keys [crux-node]}]
+  (-> (handler crux-node)
       (wrap-anti-forgery
        {:read-token (fn [req]
                       (get-in req [:body-params :csrf-token]))})

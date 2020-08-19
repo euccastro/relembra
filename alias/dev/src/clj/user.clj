@@ -27,7 +27,7 @@
 ;; integrant.repl/reset will cause havoc with hot-reloading and figwheel-main
 ;; unless we restrict these.
 (apply nsrepl/set-refresh-dirs
-       (for [root ["/alias/dev" "src"]
+       (for [root ["alias/dev" "src"]
              f (file-seq (io/file root))
              :let [f-str (str f)]
              :when (and (.isDirectory f)
@@ -42,7 +42,8 @@
                                                  :secrets (ig/ref :relembra.config/secrets)}
                  :relembra.jetty/server {:handler (ig/ref :relembra.ring-handler/handler)}})
 
-(def system-cfg {:relembra.ring-handler/handler {}
+(def system-cfg {:relembra.crux/node {}
+                 :relembra.ring-handler/handler {:crux-node (ig/ref :relembra.crux/node)}
                  :relembra.jetty/server {:handler (ig/ref :relembra.ring-handler/handler)}})
 (ig/load-namespaces system-cfg)
 (integrant.repl/set-prep! (constantly system-cfg))
