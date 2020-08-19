@@ -1,5 +1,3 @@
 * stack
 ** mostrando webapp básico
-*** integrant setup
-* tecnologias
-** copiar todo de ops-panel nom tendo razom boa para o contrário
+*** buddy authentication
