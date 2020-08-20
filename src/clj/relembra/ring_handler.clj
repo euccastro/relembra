@@ -12,28 +12,31 @@
             [ring.util.http-response :refer (content-type ok)]))
 
 
-(defn- frontpage [_]
+(defn- html5-ok [title body]
   (-> (html
        (doctype :html5)
        [:html
         [:head
-         [:link {:rel "stylesheet" :href "css/mvp.css" :type "text/css"}]
+         ;[:link {:rel "stylesheet" :href "css/mvp.css" :type "text/css"}]
          [:meta {:charset "UTF-8"}]
          [:meta {:name "viewport"
                  :content "width=device-width, initial-scale=1.0"}]
-         [:title "Relembra"]]
-        [:body
-         [:div#app]
-         [:script {:type "text/javascript"}
-          (str "var csrfToken = \""
-               *anti-forgery-token*
-               "\";")]
-         [:script {:type "text/javascript"
-                   :src "/js/relembra.js"}]]])
+         [:title title]]
+        body])
       ok
       (content-type "text/html; charset=utf-8")))
 
 
+(defn- frontpage [_]
+  (html5-ok "Relembra"
+            [:body
+             [:div#app]
+             [:script {:type "text/javascript"}
+              (str "var csrfToken = \""
+                   *anti-forgery-token*
+                   "\";")]
+             [:script {:type "text/javascript"
+                       :src "/js/relembra.js"}]]))
 (defn- handler [crux-node]
   (rring/ring-handler
    (rring/router
