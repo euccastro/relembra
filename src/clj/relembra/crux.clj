@@ -20,6 +20,27 @@
     (crux/submit-tx crux-node)))
 
 
+(defn q [crux-node query]
+  (crux/q (crux/db crux-node) query))
+
+
+(defn q1 [crux-node query]
+  (ffirst (q crux-node query)))
+
+
+(defn sync-tx [crux-node tx-data]
+  (let [tx (crux/submit-tx crux-node tx-data)]
+    (crux/sync crux-node)
+    (crux/tx-committed? crux-node tx)))
+
+
+(defn update-entity [crux-node eid f & args]
+  (let [e (crux/entity (crux/db crux-node) eid)]
+    (sync-tx crux-node
+             [[:crux.tx/match eid e]
+              [:crux.tx/put (apply f e args)]])))
+
+
 (defmethod ig/init-key ::node [_ {:keys [dir init-fn!]}]
   (let [crux-node
         (crux/start-node
