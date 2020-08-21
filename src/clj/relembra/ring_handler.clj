@@ -1,13 +1,16 @@
 (ns relembra.ring-handler
-  (:require [buddy.auth :refer [authenticated?]]
+  (:require [better-cond.core :as b]
+            [buddy.auth :refer [authenticated?]]
             [buddy.auth.accessrules :refer [restrict]]
             [buddy.auth.backends.session :refer [session-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
+            [buddy.hashers :as hashers]
             [hiccup.core :refer [html]]
             [hiccup.page :refer [doctype]]
             [integrant.core :as ig]
             [muuntaja.middleware :refer [wrap-format]]
             [reitit.ring :as rring]
+            [relembra.db-model.user :as db-user]
             [ring.middleware.anti-forgery :refer [*anti-forgery-token*
                                                   wrap-anti-forgery]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
@@ -78,20 +81,29 @@
         (wrap-authorization backend))))
 
 
-(defn handle-login [{{:keys [name password redirect-to]} :params
+(defn- credentials->user [crux-node user-name password]
+  (b/cond
+    :when-let [user-id (db-user/get-user-id crux-node user-name)
+               hashed-password (db-user/get-hashed-password crux-node user-id)]
+    :when (hashers/check password hashed-password)
+    user-id))
+
+
+(defn login-handler [crux-node]
+  (fn handle-login [{{:keys [name password redirect-to]} :params
                      :as req}]
-  (if (= [name password] ["es" "quod"])
-    (-> (see-other redirect-to)
-        (assoc :session (assoc (:session req) :identity "es")))
-    ;; XXX: set error string in login instead
-    (on-error {:uri redirect-to} nil)))
+    (if-let [user-id (credentials->user crux-node name password)]
+      (-> (see-other redirect-to)
+          (assoc :session (assoc (:session req) :identity user-id)))
+      ;; XXX: set error string in login instead
+      (on-error {:uri redirect-to} nil))))
 
 
 (defn- handler [crux-node]
   (rring/ring-handler
    (rring/router
     [["/login" {:get #(-> % :params :redirect-to login)
-                :post handle-login}]
+                :post (login-handler crux-node)}]
      ["/test" {:middleware [wrap-restricted]
                :get (constantly {:status 200
                                  :headers {"Content-Type" "text/plain"}
@@ -114,3 +126,19 @@
       wrap-format
       wrap-keyword-params
       wrap-params))
+
+
+(comment
+
+  (do
+    (require '[integrant.repl.state :refer [system]])
+    (def crux-node (:relembra.crux/node system)))
+
+  (defn add-user [crux-node name password]
+    (db-user/add-user crux-node name (hashers/derive password {:alg :scrypt})))
+
+  (add-user crux-node "es" "senha")
+
+  (hashers/derive "senha" {:alg :scrypt})
+
+  )
