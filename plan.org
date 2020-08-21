@@ -1,7 +1,7 @@
 * stack
-** mostrando webapp básico
-*** buddy authentication
-**** function to hash user password and add to db
-     use scrypt
-**** function to check password vs the db hashed password
-**** hook both into the login handler
+** deployment and production setup
+*** production alias
+**** crux directory
+*** rsync config
+*** backups
+*** handling of secrets
