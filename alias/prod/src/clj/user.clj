@@ -4,9 +4,11 @@
    [relembra.system :as sys]))
 
 
-(sys/init-logging :debug)
-(sys/restrict-refresh-dirs ["alias/dev" "src"])
-(sys/prep (sys/load-config "dev-config.clj"))
+(sys/init-logging :info)
+(sys/restrict-refresh-dirs ["alias/prod" "src"])
+(sys/prep (sys/load-config "prod-config.clj"))
+(go)
+
 
 (comment
   ;; start system like this
@@ -15,6 +17,5 @@
   (reset)
   ;; hard stop system like this
   (halt)
-
 
   )

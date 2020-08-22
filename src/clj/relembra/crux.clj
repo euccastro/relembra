@@ -41,7 +41,7 @@
               [:crux.tx/put (apply f e args)]])))
 
 
-(defmethod ig/init-key ::node [_ {:keys [dir init-fn!]}]
+(defmethod ig/init-key ::node [_ {:keys [dir init-fn]}]
   (let [crux-node
         (crux/start-node
          (cond->
@@ -51,7 +51,7 @@
              dir (assoc :crux.kv/db-dir (str (io/file dir "db"))
                         :crux.standalone/event-log-kv-store 'crux.kv.lmdb/kv
                         :crux.standalone/event-log-dir (str (io/file dir "event-log")))))]
-    (when init-fn! (init-fn! crux-node))
+    (when init-fn (init-fn crux-node))
     (upsert-functions! crux-node)
     crux-node))
 
