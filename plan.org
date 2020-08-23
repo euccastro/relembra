@@ -1,7 +1,6 @@
 * stack
 ** deployment and production setup
-*** production alias
-**** crux directory
-*** rsync config
+*** create relembra.service
+*** configure nginx to point to relembra
 *** backups
 *** handling of secrets
