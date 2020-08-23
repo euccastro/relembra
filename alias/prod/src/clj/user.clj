@@ -7,7 +7,6 @@
 (sys/init-logging :info)
 (sys/restrict-refresh-dirs ["alias/prod" "src"])
 (sys/prep (sys/load-config "prod-config.clj"))
-(go)
 
 
 (comment
