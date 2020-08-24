@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Syncing..." \
+    && rsync -avz --delete-after --filter '. .rsync-filter' ./ relembra@relembra.xyz:relembra/ \
+    && echo "Reloading..." \
+    && ssh relembra@relembra.xyz "rep -p 1337 '(reset)'" \
+    && echo "Done."

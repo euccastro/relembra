@@ -1,6 +1,5 @@
 * stack
 ** deployment and production setup
-*** create relembra.service
 *** configure nginx to point to relembra
 *** backups
 *** handling of secrets

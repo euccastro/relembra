@@ -20,6 +20,9 @@
   sudo systemctl reload ssh
 * obter certificado
   sudo certbot --nginx
+* configurar nginx
+  scp etc/nginx-default-site.conf relembra@relembra.xyz:
+  ssh relembra@relembra.xyz 'sudo chown root:root nginx-default-site.conf && sudo mv nginx-default-site.conf /etc/nginx/sites-enabled/default && sudo systemctl reload nginx'
 * install clj
   https://clojure.org/guides/getting_started
 * install rep
