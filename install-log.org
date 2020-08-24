@@ -18,9 +18,9 @@
       PasswordAuthentication no
       UsePam no
   sudo systemctl reload ssh
-* obter certificado
+* obtain TLS cert
   sudo certbot --nginx
-* configurar nginx
+* configure nginx
   scp etc/nginx-default-site.conf relembra@relembra.xyz:
   ssh relembra@relembra.xyz 'sudo chown root:root nginx-default-site.conf && sudo mv nginx-default-site.conf /etc/nginx/sites-enabled/default && sudo systemctl reload nginx'
 * install clj
@@ -32,11 +32,22 @@
   sudo mv rep-0.1.2-linux-amd64/rep.1 /usr/bin
   sudo mv rep-0.1.2-linux-amd64/rep.1 /usr/share/man/man1/
   sudo rm -rf rep-0.1.2-linux-amd64*
-* add aws credentials
-  sudo vim /etc/environment
-  add credentials for user with access to the relembra-crux bucket
-  AWS_ACCESS_KEY_ID=...
-  AWS_SECRET_ACCESS_KEY=...
+* backups
+** add aws credentials
+   mkdir ~/.aws
+   vim ~/.aws/credentials
+   add credentials for user with access to the relembra-crux bucket
+
+   [default]
+   aws_access_key_id=...
+   aws_secret_access_key=...
+
+   chmod 400 ~/.aws/credentials
+** create backup jobs
+   crontab -e
+   add
+ 0 0 * * * /home/relembra/relembra/etc/backup_db.py daily /home/relembra/relembra-db 2>&1 | logger -t daily_backup
+ 0 1 * * 0 /home/relembra/relembra/etc/backup_db.py weekly /home/relembra/relembra-db 2>&1 | logger -t weekly_backup
 * create relembra service
   scp etc/relembra.service relembra@relembra.xyz:
   ssh relembra@relembra.xyz 'sudo mv relembra.service /lib/systemd/system/ &&
