@@ -1,5 +1,4 @@
 * stack
 ** deployment and production setup
-*** configure nginx to point to relembra
 *** backups
-*** handling of secrets
+*** correr nrepl server em production

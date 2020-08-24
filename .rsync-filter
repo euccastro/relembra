@@ -10,3 +10,4 @@
 - /alias/prod/target/public/js/prod/***
 - *.org
 - *.log
+- /*-config.clj
