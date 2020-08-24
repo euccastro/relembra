@@ -1,4 +1,7 @@
 * stack
 ** deployment and production setup
 *** backups
+**** copiar backup source
+**** set up cron job
+**** install mdb tools
 *** correr nrepl server em production

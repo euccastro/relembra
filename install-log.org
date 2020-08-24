@@ -1,7 +1,7 @@
 * as root, create and set up relembra user
 ** apt update e upgrade
 ** install packages
-   apt install vim fail2ban ufw nginx certbot python-certbot-nginx rlwrap openjdk-11-jdk
+   apt install vim fail2ban ufw nginx certbot python-certbot-nginx rlwrap openjdk-11-jdk python3-boto3 lmdb-utils
 ** add user relembra
    adduser relembra
 ** set as passwordless sudoer
@@ -32,6 +32,11 @@
   sudo mv rep-0.1.2-linux-amd64/rep.1 /usr/bin
   sudo mv rep-0.1.2-linux-amd64/rep.1 /usr/share/man/man1/
   sudo rm -rf rep-0.1.2-linux-amd64*
+* add aws credentials
+  sudo vim /etc/environment
+  add credentials for user with access to the relembra-crux bucket
+  AWS_ACCESS_KEY_ID=...
+  AWS_SECRET_ACCESS_KEY=...
 * create relembra service
   scp etc/relembra.service relembra@relembra.xyz:
   ssh relembra@relembra.xyz 'sudo mv relembra.service /lib/systemd/system/ &&
