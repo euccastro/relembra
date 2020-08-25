@@ -6,7 +6,7 @@
             [hashp.core]                         ; to enable #p data readers
             [clojure.java.io :as io]
             [clojure.tools.namespace.repl :as nsrepl]
-            [taoensso.timbre :as timbre :refer [warn]]
+            [taoensso.timbre :as timbre :refer [info warn]]
             [taoensso.timbre.tools.logging :refer [use-timbre]]))
 
 
@@ -46,14 +46,17 @@
   (read-string (slurp (io/file filename))))
 
 
-(defn prep [{:keys [db-dir db-init-fn http-port]}]
-  (let [system-cfg {:relembra.crux/node {:dir db-dir
-                                         :init-fn db-init-fn}
-                    :relembra.ring-handler/handler
-                    {:crux-node (ig/ref :relembra.crux/node)}
-                    :relembra.jetty/server
-                    {:port http-port
-                     :handler (ig/ref :relembra.ring-handler/handler)}}]
+(defn prep [{:keys [db-dir db-init-fn http-port nrepl-port]}]
+  (let [system-cfg
+        (cond-> {:relembra.crux/node {:dir db-dir
+                                      :init-fn db-init-fn}
+                 :relembra.ring-handler/handler
+                 {:crux-node (ig/ref :relembra.crux/node)}
+                 :relembra.jetty/server
+                 {:port http-port
+                  :handler (ig/ref :relembra.ring-handler/handler)}}
+          nrepl-port (assoc :relembra.nrepl/server {:port nrepl-port}))]
+    (info "System config:" (pr-str system-cfg))
     (ig/load-namespaces system-cfg)
     (integrant.repl/set-prep! (constantly system-cfg))))
 
