@@ -104,15 +104,18 @@
    (rring/router
     [["/login" {:get #(-> % :params :redirect-to login)
                 :post (login-handler crux-node)}]
-     ["/test" {:middleware [wrap-restricted]
-               :get (constantly {:status 200
-                                 :headers {"Content-Type" "text/plain"}
-                                 :body "OK"})}]])
-   (rring/routes
-    (rring/create-resource-handler
-       {:path "/"})
-    (rring/create-default-handler
-     {:not-found frontpage}))))
+     [""
+      {:middleware [wrap-restricted]}
+      ["/initial-data" {:get (constantly (ok {:test/data 42}))}]
+      ["/test" {:get (constantly {:status 200
+                                  :headers {"Content-Type" "text/plain"}
+                                  :body "OK"})}]]])
+   (identity #_wrap-restricted
+    (rring/routes
+     (rring/create-resource-handler
+      {:path "/"})
+     (rring/create-default-handler
+      {:not-found frontpage})))))
 
 
 (defmethod ig/init-key ::handler

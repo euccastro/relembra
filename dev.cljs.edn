@@ -1,0 +1,9 @@
+^{:watch-dirs ["src/cljc" "src/cljs" "alias/dev/src/cljs"]
+  :css-dirs ["resources/public/css"]
+  :open-url "http://127.0.0.1:3000/"
+  :target-dir "alias/dev/target"}
+{:main relembra.start
+ :optimizations :none
+ :output-to "alias/dev/target/public/js/relembra.js"
+ :output-dir "alias/dev/target/public/js/dev"
+ :asset-path "js/dev"}

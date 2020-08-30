@@ -19,19 +19,6 @@
     ["*" :info]]))
 
 
-;; integrant.repl/reset will cause havoc with hot-reloading and figwheel-main
-;; unless we restrict these.
-(defn restrict-refresh-dirs [roots]
-  (apply nsrepl/set-refresh-dirs
-         (for [root roots
-               f (file-seq (io/file root))
-               :let [f-str (str f)]
-               :when (and (.isDirectory f)
-                          (not (str/includes? f-str "/cljs/"))
-                          (not (str/ends-with? f-str "/cljs")))]
-           f)))
-
-
 (defn hotload-dep
   "Only works with -A:hotload-deps"
   [& args]

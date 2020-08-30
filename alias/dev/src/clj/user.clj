@@ -1,11 +1,12 @@
 (ns user
   (:require
+   [clojure.tools.namespace.repl :as nsrepl]
    [integrant.repl :refer (go reset halt)]
    [relembra.system :as sys]))
 
 
 (sys/init-logging :debug)
-(sys/restrict-refresh-dirs ["alias/dev" "src"])
+(nsrepl/set-refresh-dirs "alias/dev/src/clj" "alias/dev/src/cljc" "src/clj" "src/cljc")
 (sys/prep (sys/load-config "dev-config.clj"))
 
 (comment

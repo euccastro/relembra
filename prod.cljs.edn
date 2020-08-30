@@ -1,0 +1,8 @@
+^{:watch-dirs ["src/cljc" "src/cljs" "alias/prod/src/cljs"]
+  :open-url false
+  :target-dir "alias/prod/target"
+  :cljs-devtools false}
+{:main relembra.start
+ :optimizations :advanced
+ :output-to "alias/prod/target/public/js/relembra.js"
+ :output-dir "alias/prod/target/public/js/prod"}
