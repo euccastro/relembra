@@ -31,9 +31,22 @@
    (-> route :data :name)))
 
 
+(rf/reg-event-db
+ :common/set-error
+ (fn [db error]
+   (assoc db :common/error error)))
+
+
+(rf/reg-sub
+ :common/error
+ (fn [db _]
+   (:common/error db)))
+
+
 (def routes
   [["/" :review]
    ["/edit-question" :edit-question]
+   ["/md" :md]
    ["/not-found" :not-found]])
 
 
