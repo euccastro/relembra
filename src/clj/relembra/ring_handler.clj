@@ -19,25 +19,36 @@
             [ring.util.http-response :refer [content-type ok see-other]]))
 
 
-(defn- html5-ok [title body]
-  (-> (html
-       (doctype :html5)
-       [:html
-        [:head
-         ;[:link {:rel "stylesheet" :href "css/mvp.css" :type "text/css"}]
-         [:meta {:charset "UTF-8"}]
-         [:meta {:name "viewport"
-                 :content "width=device-width, initial-scale=1.0"}]
-         [:title title]]
-        body])
-      ok
-      (content-type "text/html; charset=utf-8")))
-
+(defn- html5-ok
+  ([title body]
+   (html5-ok title [] body))
+  ([title head body]
+   (-> (html
+        (doctype :html5)
+        `[:html
+          [:head
+           [:meta {:charset "UTF-8"}]
+           [:meta {:name "viewport"
+                   :content "width=device-width, initial-scale=1.0"}]
+           [:title ~title]
+           ~@head]
+          [:body
+           ~@body]])
+       ok
+       (content-type "text/html; charset=utf-8"))))
 
 (defn- frontpage [_]
   (html5-ok "Relembra"
-            [:body
-             [:div#app]
+            [[:link {:rel "stylesheet" :href "https://cdn.jsdelivr.net/font-hack/2.020/css/hack-extended.min.css"}]
+             [:link {:rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Yrsa"}]
+             [:link {:rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Roboto:400,300,500&amp;subset=latin" :media "all"}]
+             [:script {:type "text/x-mathjax-config"}
+              "MathJax.Hub.Config({asciimath2jax: {delimiters: [['¡','¡']]}});"]
+             [:script#MathJax-script
+              {:type "text/javascript"
+               :async true
+               :src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=AM_CHTML"}]]
+            [[:div#app]
              [:script {:type "text/javascript"}
               (str "var csrfToken = \""
                    *anti-forgery-token*
@@ -47,19 +58,18 @@
 
 (defn- login [redirect-to]
   (html5-ok "Login"
-   [:body
-    [:form {:method "post"
-            :action "/login"}
-     [:input {:type "hidden" :name "csrf-token" :value *anti-forgery-token*}]
-     [:input {:type "hidden" :name "redirect-to" :value redirect-to}]
-     [:div
-      [:label "Name"
-       [:input {:type "text" :name "name" :required true}]]]
-     [:div
-      [:label "Password"
-       [:input {:type "password" :name "password" :required true}]]]
-     [:div
-      [:input {:type "submit" :value "Login"}]]]]))
+            [[:form {:method "post"
+                     :action "/login"}
+              [:input {:type "hidden" :name "csrf-token" :value *anti-forgery-token*}]
+              [:input {:type "hidden" :name "redirect-to" :value redirect-to}]
+              [:div
+               [:label "Name"
+                [:input {:type "text" :name "name" :required true}]]]
+              [:div
+               [:label "Password"
+                [:input {:type "password" :name "password" :required true}]]]
+              [:div
+               [:input {:type "submit" :value "Login"}]]]]))
 
 
 (defn on-error [request _]

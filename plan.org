@@ -3,8 +3,31 @@
 ** cousas de relembra
 *** use cases
 **** acrescentar lembrando
-***** mathjax
+***** experimento
+****** novo endpoint
+       /md
+       mostra um textarea, side by side com um output
+       quando editamos o textarea no output aparece o texto interpretado como html
+       a seguir, tentamos interpretar mathjax nisso
 ***** markdown-clj
+      idem, ver como está isto no ops panel velho
+:require
+            [markdown.core :refer (md->html)]
+
+      [:div {:style {:font-family "Yrsa, serif" :font-size "120%" :color (ui/color :teal900)}}
+        [util/mathjax-box text]]
+
+(def mathjax-box
+  (with-meta markdown-box
+    {:component-did-mount typeset
+     :component-did-update typeset}))
+
+(defn markdown-box [text]
+  [:div {:style {:font-family "Yrsa, serif" :font-size "120%"}
+         :dangerouslySetInnerHTML {:__html (md->html text :inhibit-separator "$")}}])
+
+(defn typeset [c]
+  (js/MathJax.Hub.Queue (array "Typeset" js/MathJax.Hub (r/dom-node c))))
 ****** portanto cljs
 *** repetition spacing
 **** tempo é importante

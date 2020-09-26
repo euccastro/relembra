@@ -20,6 +20,7 @@
         juxt/crux-core {:mvn/version "20.08-1.10.1-beta"}
         juxt/crux-lmdb {:mvn/version "20.08-1.10.1-alpha"}
         kee-frame {:mvn/version "0.4.0" :exclusions [metosin/reitit-core]}
+        markdown-clj {:mvn/version "1.10.5"}
         metosin/muuntaja {:mvn/version "0.6.7"}
         metosin/reitit {:mvn/version "0.5.5"}
         metosin/ring-http-response {:mvn/version "0.9.1"}
