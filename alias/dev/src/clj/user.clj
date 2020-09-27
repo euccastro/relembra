@@ -18,4 +18,10 @@
   (halt)
 
 
+  (def crux-node (:relembra.crux/node integrant.repl.state/system))
+
+  (require '[relembra.db-model.user :as db-user])
+
+  (db-user/get-user-id crux-node "es")
+
   )

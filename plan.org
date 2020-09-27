@@ -1,7 +1,7 @@
 * stack
 ** criar utente
 *** puramente programática
-*** crio um no dev environment by default
+*** crio um no dev environment
 ** use login on dev?
    nom custa nada...
    mais meter um utente es/quod

@@ -1,11 +1,10 @@
 (ns relembra.system
-  (:require clojure.pprint
-            [clojure.string :as str]
+  (:require [buddy.hashers :as hashers]
+            [clojure.java.io :as io]
+            [hashp.core]                ; to enable #p data readers
             [integrant.core :as ig]
             integrant.repl
-            [hashp.core]                         ; to enable #p data readers
-            [clojure.java.io :as io]
-            [clojure.tools.namespace.repl :as nsrepl]
+            [relembra.db-model.user :as db-user]
             [taoensso.timbre :as timbre :refer [info warn]]
             [taoensso.timbre.tools.logging :refer [use-timbre]]))
 
@@ -33,7 +32,12 @@
   (read-string (slurp (io/file filename))))
 
 
-(defn prep [{:keys [db-dir http-port nrepl-port]}]
+(defmethod ig/init-key ::init [_ {:keys [crux-node]
+                                  {:keys [username password]} :user}]
+  (db-user/add-user crux-node username (hashers/derive password)))
+
+
+(defn prep [{:keys [db-dir init-user http-port nrepl-port]}]
   (let [system-cfg
         (cond-> {:relembra.crux/node {:dir db-dir}
                  :relembra.ring-handler/handler
@@ -41,14 +45,15 @@
                  :relembra.jetty/server
                  {:port http-port
                   :handler (ig/ref :relembra.ring-handler/handler)}}
-          nrepl-port (assoc :relembra.nrepl/server {:port nrepl-port}))]
+          nrepl-port (assoc :relembra.nrepl/server {:port nrepl-port})
+          init-user (assoc :relembra.system/init {:crux-node (ig/ref :relembra.crux/node)
+                                                  :user init-user}))]
     (info "System config:" (pr-str system-cfg))
     (ig/load-namespaces system-cfg)
     (integrant.repl/set-prep! (constantly system-cfg))))
 
 
 (comment
-
 
 
   )
