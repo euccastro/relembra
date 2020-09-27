@@ -1,83 +1,58 @@
 * stack
-** cljs
-** cousas de relembra
-*** use cases
-**** acrescentar lembrando
-***** experimento
-****** novo endpoint
-       /md
-       mostra um textarea, side by side com um output
-       quando editamos o textarea no output aparece o texto interpretado como html
-       a seguir, tentamos interpretar mathjax nisso
-***** markdown-clj
-      idem, ver como está isto no ops panel velho
-:require
-            [markdown.core :refer (md->html)]
-
-      [:div {:style {:font-family "Yrsa, serif" :font-size "120%" :color (ui/color :teal900)}}
-        [util/mathjax-box text]]
-
-(def mathjax-box
-  (with-meta markdown-box
-    {:component-did-mount typeset
-     :component-did-update typeset}))
-
-(defn markdown-box [text]
-  [:div {:style {:font-family "Yrsa, serif" :font-size "120%"}
-         :dangerouslySetInnerHTML {:__html (md->html text :inhibit-separator "$")}}])
-
-(defn typeset [c]
-  (js/MathJax.Hub.Queue (array "Typeset" js/MathJax.Hub (r/dom-node c))))
-****** portanto cljs
-*** repetition spacing
-**** tempo é importante
-***** empregar a livraria moderna que usa luminus
-**** make sense of sm5
-***** single call: sm5/next-state
-****** args
-******* rate
-******* of-matrix (user)
-******* remembering-state (user, lembrando)
-****** retval
-******* days-to-next
-******* new-user-state (of-matrix)
-******* new-item-state (remembering-state)
-***** needs-repeat?
-      quando erramos umha questom, chamamos sm5/next-state umha vez só, e entom
-      repetimos a questom as vezes que figer falta, mais sem chamar
-      sm5/next-state. podo chamar este estado algo assi como failing?
-***** quero recuperar of-matrix de perguntas velhas?
+** criar utente
+*** puramente programática
+*** crio um no dev environment by default
+** use login on dev?
+   nom custa nada...
+   mais meter um utente es/quod
+   logo temos que ter concepto de utente
+** repetition spacing
+*** tempo é importante
+**** empregar a livraria moderna que usa luminus
+*** make sense of sm5
+**** single call: sm5/next-state
+***** args
+****** rate
+****** of-matrix (user)
+****** remembering-state (user, lembrando)
+***** retval
+****** days-to-next
+****** new-user-state (of-matrix)
+****** new-item-state (remembering-state)
+**** needs-repeat?
+     quando erramos umha questom, chamamos sm5/next-state umha vez só, e entom
+     repetimos a questom as vezes que figer falta, mais sem chamar
+     sm5/next-state. podo chamar este estado algo assi como failing?
+**** quero recuperar of-matrix de perguntas velhas?
 nem of-matrix nem item-status; provavelmente as queira reincorporar como
 material novo de vez.
-**** schema
+*** schema
+**** utente
+***** nome
+***** hashed-password
+***** of-matrix
+**** pergunta/resposta
+***** pergunta
+***** resposta
+**** lembrando
 ***** utente
-****** nome
-****** hashed-password
-****** of-matrix
 ***** pergunta/resposta
-****** pergunta
-****** resposta
+***** due-date
+***** failing?
+      pode ser true para lembrandos com due-date no futuro, e nesse caso devo
+      processá-los imediatamente igual.
+**** recall (for logging, attached to txns)
+***** utente
 ***** lembrando
-****** utente
-****** pergunta/resposta
-****** due-date
-****** failing?
-       pode ser true para lembrandos com due-date no futuro, e nesse caso devo
-       processá-los imediatamente igual.
-***** recall (for logging, attached to txns)
-****** utente
-****** lembrando
-****** rate
-**** initialization
-***** user
-      manual, via REPL
-      optimal factor matrix pode ser missing
-***** lembrando
-      permitir null due date?  sm5 doesn't care.  pero é harder to query for.
-      melhor epoch due date.
-      remembering state pode ser nil.
-*** cljs?
-*** editing a question
-**** markdown-clj(s)
-*** rendering questions
-**** markdown-clj(s)
+***** rate
+*** initialization
+**** user
+     manual, via REPL
+     optimal factor matrix pode ser missing
+**** lembrando
+     permitir null due date?  sm5 doesn't care.  pero é harder to query for.
+     melhor epoch due date.
+     remembering state pode ser nil.
+** reorganizar código cljs
+   ou ter em screen/tab/section/...?
+   nom o tenho claro; por enquanto deixar assi
