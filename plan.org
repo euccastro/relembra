@@ -1,14 +1,6 @@
 * stack
-** criar utente
-*** puramente programática
-*** crio um no dev environment
-** use login on dev?
-   nom custa nada...
-   mais meter um utente es/quod
-   logo temos que ter concepto de utente
 ** repetition spacing
 *** tempo é importante
-**** empregar a livraria moderna que usa luminus
 *** make sense of sm5
 **** single call: sm5/next-state
 ***** args
