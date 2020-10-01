@@ -6,13 +6,13 @@
 (defn get-user-id [crux-node name]
   (q1 crux-node
       {:find ['u]
-       :where [['u :user/name name]]}))
+       :where [['u :relembra.user/name name]]}))
 
 
 (defn get-hashed-password [crux-node user-id]
   (q1 crux-node
       {:find ['p]
-       :where [[user-id :user/hashed-password 'p]]}))
+       :where [[user-id :relembra.user/hashed-password 'p]]}))
 
 
 (defn add-user [crux-node name hashed-password]
@@ -22,8 +22,8 @@
     (sync-tx crux-node
              [[:crux.tx/match uid nil]
               [:crux.tx/put {:crux.db/id uid
-                             :user/name name
-                             :user/hashed-password hashed-password}]])))
+                             :relembra.user/name name
+                             :relembra.user/hashed-password hashed-password}]])))
 
 
 (comment
@@ -32,7 +32,6 @@
     (require '[integrant.repl.state :refer [system]])
     (def crux-node (:relembra.crux/node system)))
 
-  (add-user crux-node "es" "nathoesunathoe-pass")
   (def uid (get-user-id crux-node "es"))
   (get-hashed-password crux-node uid)
   )

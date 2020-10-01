@@ -1,5 +1,6 @@
 * stack
 ** repetition spacing
+*** basic smoke tests de salvar e recuperar utente
 *** tempo é importante
 **** usar juxt/tick?
 ***** literals
