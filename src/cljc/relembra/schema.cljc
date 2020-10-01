@@ -21,7 +21,7 @@
    [:relembra.user/name nonempty-string]
    [:relembra.user/hashed-password nonempty-string]
    [:relembra.user/of-matrix {:optional true} [:vector double?]]])
-(def user-validator (m/validator user))
+(def user? (m/validator user))
 
 
 (def lembrando
@@ -31,8 +31,9 @@
    [:relembra.lembrando/question nonempty-string]
    [:relembra.lembrando/answer nonempty-string]
    [:relembra.lembrando/due-date date?]
-   [:relembra.lembrando/failing? {:optional true} boolean?]])
-(def lembrando-validator
+   [:relembra.lembrando/failing? boolean?]
+   [:relembra.lembrando/remembering-state {:optional true} [:vector double?]]])
+(def lembrando?
   (m/validator lembrando {:registry registry}))
 
 
@@ -42,27 +43,27 @@
    [:relembra.recall/user uuid?]
    [:relembra.recall/lembrando uuid?]
    [:relembra.recall/rate pos-int?]])
-(def recall-validator (m/validator recall))
+(def recall? (m/validator recall))
 
 
 (comment
 
   (require '[clj-uuid :as uuid])
 
-  (user-validator {:crux.db/id (uuid/v1)
-                   :relembra.user/name "es"
-                   :relembra.user/hashed-password "abcde123"
-                   :relembra.user/of-matrix [1.0 2.0 3.0]})
+  (user? {:crux.db/id (uuid/v1)
+          :relembra.user/name "es"
+          :relembra.user/hashed-password "abcde123"
+          :relembra.user/of-matrix [1.0 2.0 3.0]})
 
-  (lembrando-validator {:crux.db/id (uuid/v1)
-                        :relembra.lembrando/user (uuid/v1)
-                        :relembra.lembrando/question "que?"
-                        :relembra.lembrando/answer "pois"
-                        :relembra.lembrando/due-date (t/date)
-                        :relembra.lembrando/failing? true})
+  (lembrando? {:crux.db/id (uuid/v1)
+               :relembra.lembrando/user (uuid/v1)
+               :relembra.lembrando/question "que?"
+               :relembra.lembrando/answer "pois"
+               :relembra.lembrando/due-date (t/date)
+               :relembra.lembrando/failing? true})
 
-  (recall-validator {:crux.db/id (uuid/v1)
-                     :relembra.recall/user (uuid/v1)
-                     :relembra.recall/lembrando (uuid/v1)
-                     :relembra.recall/rate 3})
+  (recall? {:crux.db/id (uuid/v1)
+            :relembra.recall/user (uuid/v1)
+            :relembra.recall/lembrando (uuid/v1)
+            :relembra.recall/rate 3})
   )
