@@ -1,6 +1,15 @@
 * stack
 ** repetition spacing
 *** tempo é importante
+**** usar juxt/tick?
+***** literals
+***** uniform interface for clj+cljs
+**** serialization/deserialization
+     usar transit ou edn?
+     usar readers/writers de tick
+          :reader          (transit/reader :json time/time-deserialization-handlers)
+          :writer          (transit/writer :json time/time-serialization-handlers)
+     https://github.com/luminus-framework/luminus-transit/blob/master/src/luminus_transit/time.cljc
 *** make sense of sm5
 **** single call: sm5/next-state
 ***** args

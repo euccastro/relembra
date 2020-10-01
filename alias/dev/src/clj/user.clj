@@ -24,4 +24,23 @@
 
   (db-user/get-user-id crux-node "es")
 
+
+  (require '[tick.alpha.api :as tick])
+
+  (tick/now)
+
+  (type *1)
+
+  (tick/zone "Europe/Paris")
+
+  (tick/now)
+  (tick/time)
+  (tick/today)
+  (tick/date-time)
+  (tick/offset-date-time (-> (tick/time "11:00") (tick/on "1918-05-11") (tick/in "Europe/Paris")))
+
+  (.getOffset *1)
+  (def z *1)
+  (type z)
+  (doc *1)
   )
