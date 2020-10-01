@@ -24,19 +24,12 @@
 (def user-validator (m/validator user))
 
 
-(def question
-  [:map
-   [:crux.db/id uuid?]
-   [:relembra.question/question nonempty-string]
-   [:relembra.question/answer nonempty-string]])
-(def question-validator (m/validator question))
-
-
 (def lembrando
   [:map
    [:crux.db/id uuid?]
    [:relembra.lembrando/user uuid?]
-   [:relembra.lembrando/question uuid?]
+   [:relembra.lembrando/question nonempty-string]
+   [:relembra.lembrando/answer nonempty-string]
    [:relembra.lembrando/due-date date?]
    [:relembra.lembrando/failing? {:optional true} boolean?]])
 (def lembrando-validator
@@ -54,7 +47,6 @@
 
 (comment
 
-
   (require '[clj-uuid :as uuid])
 
   (user-validator {:crux.db/id (uuid/v1)
@@ -64,7 +56,8 @@
 
   (lembrando-validator {:crux.db/id (uuid/v1)
                         :relembra.lembrando/user (uuid/v1)
-                        :relembra.lembrando/question (uuid/v1)
+                        :relembra.lembrando/question "que?"
+                        :relembra.lembrando/answer "pois"
                         :relembra.lembrando/due-date (t/date)
                         :relembra.lembrando/failing? true})
 
