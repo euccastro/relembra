@@ -148,10 +148,8 @@
     (def crux-node (:relembra.crux/node system)))
 
   (defn add-user [crux-node name password]
-    (db-user/add-user crux-node name (hashers/derive password {:alg :scrypt})))
+    (db-user/add-user crux-node name (hashers/derive password)))
 
-  (add-user crux-node "es" "senha")
-
-  (hashers/derive "senha" {:alg :scrypt})
+  (add-user crux-node "outro" "senha")
 
   )

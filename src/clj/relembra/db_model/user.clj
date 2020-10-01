@@ -1,6 +1,7 @@
 (ns relembra.db-model.user
   (:require [clj-uuid :as uuid]
-            [relembra.crux :refer [q1 sync-tx]]))
+            [relembra.crux :refer [q1 sync-tx]]
+            [relembra.schema :refer [user-validator]]))
 
 
 (defn get-user-id [crux-node name]
@@ -18,12 +19,15 @@
 (defn add-user [crux-node name hashed-password]
   (when-let [uid (get-user-id crux-node name)]
     (throw (ex-info "user already exists" {:name name :uid uid})))
-  (let [uid (uuid/v1)]
-    (sync-tx crux-node
-             [[:crux.tx/match uid nil]
-              [:crux.tx/put {:crux.db/id uid
-                             :relembra.user/name name
-                             :relembra.user/hashed-password hashed-password}]])))
+  (let [uid (uuid/v1)
+        user {:crux.db/id uid
+              :relembra.user/name name
+              :relembra.user/hashed-password hashed-password}]
+    (if (user-validator user)
+      (sync-tx crux-node
+               [[:crux.tx/match uid nil]
+                [:crux.tx/put user]])
+      (throw (ex-info "invalid user?" {:user user})))))
 
 
 (comment
