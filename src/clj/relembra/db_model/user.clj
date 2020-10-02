@@ -38,4 +38,8 @@
 
   (def uid (get-user-id crux-node "es"))
   (get-hashed-password crux-node uid)
+
+  (add-user crux-node "lhou" "senhahashada")
+
+  (get-hashed-password crux-node (get-user-id crux-node "lhou"))
   )

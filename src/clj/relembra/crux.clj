@@ -40,17 +40,15 @@
              [[:crux.tx/match eid e]
               [:crux.tx/put (apply f e args)]])))
 
-
 (defmethod ig/init-key ::node [_ {:keys [dir]}]
-  (let [crux-node
-        (crux/start-node
-         (cond->
-             {:crux.node/topology
-              (cond-> '[crux.standalone/topology]
-                dir (conj 'crux.kv.lmdb/kv-store) )}
-             dir (assoc :crux.kv/db-dir (str (io/file dir "db"))
-                        :crux.standalone/event-log-kv-store 'crux.kv.lmdb/kv
-                        :crux.standalone/event-log-dir (str (io/file dir "event-log")))))]
+  (let [crux-node (crux/start-node (if dir
+                                     {:gold-store {:crux/module 'crux.lmdb/->kv-store
+                                                   :db-dir (io/file dir)}
+                                      ;; I don't bother with an index store,
+                                      ;; since I expect I'll have small DBs
+                                      :crux/document-store {:kv-store :gold-store}
+                                      :crux/tx-log {:kv-store :gold-store}}
+                                     {}))]
     (upsert-functions! crux-node)
     crux-node))
 

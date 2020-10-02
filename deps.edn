@@ -17,8 +17,8 @@
         hiccup {:mvn/version "1.0.5"}
         integrant {:mvn/version "0.8.0"}
         integrant/repl {:mvn/version "0.3.1"}
-        juxt/crux-core {:mvn/version "20.08-1.10.1-beta"}
-        juxt/crux-lmdb {:mvn/version "20.08-1.10.1-alpha"}
+        juxt/crux-core {:mvn/version "20.09-1.12.1-beta"}
+        juxt/crux-lmdb {:mvn/version "20.09-1.12.1-alpha"}
         kee-frame {:mvn/version "0.4.0" :exclusions [metosin/reitit-core]}
         markdown-clj {:mvn/version "1.10.5"}
         metosin/muuntaja {:mvn/version "0.6.7"}
