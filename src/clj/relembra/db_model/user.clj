@@ -1,7 +1,7 @@
 (ns relembra.db-model.user
   (:require [clj-uuid :as uuid]
             [relembra.crux :refer [q1 sync-tx]]
-            [relembra.schema :refer [user-validator]]))
+            [relembra.schema :refer [user?]]))
 
 
 (defn get-user-id [crux-node name]
@@ -23,7 +23,7 @@
         user {:crux.db/id uid
               :relembra.user/name name
               :relembra.user/hashed-password hashed-password}]
-    (if (user-validator user)
+    (if (user? user)
       (sync-tx crux-node
                [[:crux.tx/match uid nil]
                 [:crux.tx/put user]])
