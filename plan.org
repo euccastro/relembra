@@ -1,16 +1,24 @@
 * stack
+** ui design
+*** smoke test for adding a user
+*** smoke test for adding a lembrando
+*** add lembrando
+    primeiro este?  já tenho todo o que preciso no backend
+    pode ser umha seçom
+    quando acrescento clear
+    no entanto mantenho o estado
+    /add
+*** edit lembrando
+    outra seçom... mais o que passa se clico nela sem mais?
+    /edit -> helpful reminder de que nom está implementado search
+    podo procurar os IDs no repl or something
+    /edit/<lembrando-id>
+    nom hai funçom de procurar lembrando por enquanto
+    só podo editar os lembrandos que me tocam para o dia
+*** review
+    /review (sem mais)
+    isto pode ser umha seçom
 ** repetition spacing
-*** basic smoke tests de salvar e recuperar utente
-*** tempo é importante
-**** usar juxt/tick?
-***** literals
-***** uniform interface for clj+cljs
-**** serialization/deserialization
-     usar transit ou edn?
-     usar readers/writers de tick
-          :reader          (transit/reader :json time/time-deserialization-handlers)
-          :writer          (transit/writer :json time/time-serialization-handlers)
-     https://github.com/luminus-framework/luminus-transit/blob/master/src/luminus_transit/time.cljc
 *** make sense of sm5
 **** single call: sm5/next-state
 ***** args
@@ -33,13 +41,12 @@ material novo de vez.
 ***** nome
 ***** hashed-password
 ***** of-matrix
-**** pergunta/resposta
-***** pergunta
-***** resposta
 **** lembrando
 ***** utente
-***** pergunta/resposta
+***** pergunta
+***** resposta
 ***** due-date
+***** remembering-state
 ***** failing?
       pode ser true para lembrandos com due-date no futuro, e nesse caso devo
       processá-los imediatamente igual.
@@ -55,6 +62,14 @@ material novo de vez.
      permitir null due date?  sm5 doesn't care.  pero é harder to query for.
      melhor epoch due date.
      remembering state pode ser nil.
+*** tempo é importante
+    juxt/tick
+**** serialization/deserialization
+     usar transit ou edn?
+     usar readers/writers de tick
+          :reader          (transit/reader :json time/time-deserialization-handlers)
+          :writer          (transit/writer :json time/time-serialization-handlers)
+     https://github.com/luminus-framework/luminus-transit/blob/master/src/luminus_transit/time.cljc
 ** reorganizar código cljs
    ou ter em screen/tab/section/...?
    nom o tenho claro; por enquanto deixar assi
