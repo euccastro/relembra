@@ -16,6 +16,10 @@
        :where [[user-id :relembra.user/hashed-password 'p]]}))
 
 
+(defn user-exists? [crux-node user-id]
+  (some? (get-hashed-password crux-node user-id)))
+
+
 (defn add-user [crux-node name hashed-password]
   (when-let [uid (get-user-id crux-node name)]
     (throw (ex-info "user already exists" {:name name :uid uid})))
@@ -24,9 +28,10 @@
               :relembra.user/name name
               :relembra.user/hashed-password hashed-password}]
     (if (user? user)
-      (sync-tx crux-node
-               [[:crux.tx/match uid nil]
-                [:crux.tx/put user]])
+      (and (sync-tx crux-node
+                [[:crux.tx/match uid nil]
+                 [:crux.tx/put user]])
+           uid)
       (throw (ex-info "invalid user?" {:user user})))))
 
 

@@ -1,41 +1,51 @@
 (ns relembra.db-model.lembrando
   (:require [clj-uuid :as uuid]
             [relembra.crux :refer [q1 sync-tx]]
-            [relembra.db-model.user :as db-user]
+            [relembra.db-model.qa :as db-qa]
             [relembra.schema :refer [lembrando?]]
             [tick.alpha.api :as t]
             [crux.api :as crux]))
 
 
-(defn user-exists? [crux-node user-id]
-  (some? (db-user/get-hashed-password crux-node user-id)))
+(defn qa->lembrando-id [crux-node qa]
+  (q1 crux-node
+      {:find ['l]
+       :where [['l :relembra.lembrando/qa qa]]}))
 
 
-(defn add-lembrando [crux-node user-id question answer]
-  (let [lid (uuid/v1)
-        lembrando {:crux.db/id lid
-                   :relembra.lembrando/user user-id
-                   :relembra.lembrando/question question
-                   :relembra.lembrando/answer answer
-                   :relembra.lembrando/due-date (t/today)
-                   :relembra.lembrando/failing? false}]
+(defn update-lembrando [crux-node qa old new]
+  (db-qa/check-qa crux-node qa)
+  (let [lid (or (qa->lembrando-id crux-node qa) (uuid/v1))
+        lembrando (assoc new
+                         :crux.db/id lid
+                         :relembra.lembrando/qa qa)]
     (cond
-      (not (lembrando? lembrando)) (throw (ex-info "invalid lembrando?" {:lembrando lembrando}))
-      (not (user-exists? crux-node user-id)) (throw (ex-info "unknown user?" {:user-id user-id}))
-      :else (sync-tx crux-node
-                     [[:crux.tx/match lid nil]
-                      [:crux.tx/put lembrando]]))))
+      (not (lembrando? lembrando))
+      (throw (ex-info "invalid lembrando?" {:lembrando lembrando}))
+      :else (and (sync-tx crux-node
+                          [[:crux.tx/match lid old]
+                           [:crux.tx/put lembrando]])
+                 lid))))
 
 
 (comment
 
   (do
     (require '[integrant.repl.state :refer [system]])
+    (require '[relembra.db-model.user :as db-user])
     (def crux-node (:relembra.crux/node system)))
 
   (def uid (db-user/get-user-id crux-node "es"))
+  (def qa (db-qa/add-qa crux-node uid "que?" "pois"))
+  (def l {:relembra.lembrando/due-date (t/date)
+          :relembra.lembrando/failing? true
+          :relembra.lembrando/remembering-state [1.0 2.0]})
+  (def lid (update-lembrando crux-node qa nil
+                             l))
 
-  (add-lembrando crux-node uid "que?" "pois")
+  (def l2 (assoc l :crux.db/id lid :relembra.lembrando/qa qa))
+
+  (update-lembrando crux-node qa l2 (assoc l2 :relembra.lembrando/failing? false))
 
   ;; throws "unknown user"
   (add-lembrando crux-node (uuid/v1) "ha?" "já")

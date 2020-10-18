@@ -24,15 +24,22 @@
 (def user? (m/validator user))
 
 
+(def qa
+  [:map
+   [:crux.db/id uuid?]
+   [:relembra.qa/owner uuid?]
+   [:relembra.qa/question nonempty-string]
+   [:relembra.qa/answer nonempty-string]])
+(def qa? (m/validator qa))
+
+
 (def lembrando
   [:map
    [:crux.db/id uuid?]
-   [:relembra.lembrando/user uuid?]
-   [:relembra.lembrando/question nonempty-string]
-   [:relembra.lembrando/answer nonempty-string]
+   [:relembra.lembrando/qa uuid?]
    [:relembra.lembrando/due-date date?]
    [:relembra.lembrando/failing? boolean?]
-   [:relembra.lembrando/remembering-state {:optional true} [:vector double?]]])
+   [:relembra.lembrando/remembering-state [:vector double?]]])
 (def lembrando?
   (m/validator lembrando {:registry registry}))
 
@@ -56,11 +63,10 @@
           :relembra.user/of-matrix [1.0 2.0 3.0]})
 
   (lembrando? {:crux.db/id (uuid/v1)
-               :relembra.lembrando/user (uuid/v1)
-               :relembra.lembrando/question "que?"
-               :relembra.lembrando/answer "pois"
+               :relembra.lembrando/qa (uuid/v1)
                :relembra.lembrando/due-date (t/date)
-               :relembra.lembrando/failing? true})
+               :relembra.lembrando/failing? true
+               :relembra.lembrando/remembering-state [1.0 2.0 3.0]})
 
   (recall? {:crux.db/id (uuid/v1)
             :relembra.recall/user (uuid/v1)
