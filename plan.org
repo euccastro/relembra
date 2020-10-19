@@ -17,6 +17,17 @@
 ****** remembering-state
 ****** due-date
 ****** failing?
+** serialization problems
+   depois de importar time-literals:
+   (alter-var-root #'*data-readers* assoc
+    'time/date #'repro/parse-date
+    ...)
+
+*** alter-var-root nippy/*custom-readers* assoc
+*** patch read-string...
+*** make a new module that includes clojure-only (de)serialization handlers
+    by saying data_readers.clj
+*** import tick excluding serialization handlers
 ** ui design
 *** smoke test for adding a user
 *** smoke test for adding a lembrando
