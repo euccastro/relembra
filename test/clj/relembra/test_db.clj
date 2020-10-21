@@ -2,13 +2,11 @@
   (:require [clj-uuid :as uuid]
             [clojure.test :refer [deftest is use-fixtures]]
             [crux.api :as crux]
-            [relembra.crux :refer [q1]]
             [relembra.schema :as schema]
             [relembra.db-model.lembrando :as db-lmb]
             [relembra.db-model.qa :as db-qa]
             [relembra.db-model.user :as db-user]
-            [tick.alpha.api :as t]
-            [re-frame.db :as db]))
+            [tick.alpha.api :as t]))
 
 
 (defmacro throws-ex-info? [expr]
@@ -91,7 +89,7 @@
 
 
 (deftest lembrando
-  (let [{:keys [q a qa-id]} (add-test-qa)
+  (let [{:keys [qa-id]} (add-test-qa)
         other-qa-id (uuid/v1)
         due-date (t/date)
         failing? true
@@ -104,7 +102,7 @@
              {:relembra.lembrando/due-date due-date
               :relembra.lembrando/failing? failing?
               :relembra.lembrando/remembering-state remembering-state})
-        lent (db-lmb/lembrando-entity *crux-node* lid)]
+        lent (crux/entity (crux/db *crux-node*) lid)]
     (is (nil? pre-lid))
     (is (= lid (db-lmb/qa->lembrando-id *crux-node* qa-id)))
     (throws-ex-info? (db-lmb/update-lembrando
@@ -114,13 +112,16 @@
                       {:relembra.lembrando/due-date due-date
                        :relembra.lembrando/failing? failing?
                        :relembra.lembrando/remembering-state remembering-state}))
-    (is (not (schema/explain-lembrando lent)))
-    (is (schema/lembrando? lent))))
+    (is (schema/lembrando? lent))
+    (is (= lent {:crux.db/id lid
+                 :relembra.lembrando/qa qa-id
+                 :relembra.lembrando/due-date due-date
+                 :relembra.lembrando/failing? failing?
+                 :relembra.lembrando/remembering-state remembering-state}))))
 
 
 (comment
 
-  (require '[malli.core :as m])
   (def lent {:relembra.lembrando/due-date
              (. java.time.LocalDate parse "2020-10-18"),
              :relembra.lembrando/failing? true,
