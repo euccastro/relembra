@@ -1,49 +1,21 @@
 * stack
-** API de db-model/lembrando?
-*** get-lembrando qa
-*** update-lembrando old-lembrando new-data
-**** logo um lembrando si precisa remembering-state
-*** guardamos o default lembrando?
-    nom
-** merkle tree
-*** as partes que mudam tenhem um pointer às fixas
-**** lembrando-state -> lembrando
-***** qa
-****** user
-****** question
-****** answer
-***** lembrando
-****** qa
-****** remembering-state
-****** due-date
-****** failing?
-** serialization problems
-   depois de importar time-literals:
-   (alter-var-root #'*data-readers* assoc
-    'time/date #'repro/parse-date
-    ...)
-
-*** alter-var-root nippy/*custom-readers* assoc
-*** patch read-string...
-*** make a new module that includes clojure-only (de)serialization handlers
-    by saying data_readers.clj
-*** import tick excluding serialization handlers
 ** ui design
-*** smoke test for adding a user
-*** smoke test for adding a lembrando
-*** add lembrando
-    primeiro este?  já tenho todo o que preciso no backend
-    pode ser umha seçom
-    quando acrescento clear
-    no entanto mantenho o estado
-    /add
-*** edit lembrando
-    outra seçom... mais o que passa se clico nela sem mais?
-    /edit -> helpful reminder de que nom está implementado search
-    podo procurar os IDs no repl or something
-    /edit/<lembrando-id>
-    nom hai funçom de procurar lembrando por enquanto
-    só podo editar os lembrandos que me tocam para o dia
+*** edit
+**** add question/answer
+     /edit
+***** botom save
+****** obtenho qa-id e passa a ser /edit/qa-id
+**** edit question/answer
+     /edit/<qa-id>
+**** comum
+***** botom save
+      persiste as mudanças
+***** botom clear
+      apaga os campos todos
+***** botom new
+      deixa os campos como estam, passa a /edit
+**** nom hai search!
+     esperando por lucene. no entanto podo procurar os IDs no repl or something
 *** review
     /review (sem mais)
     isto pode ser umha seçom
