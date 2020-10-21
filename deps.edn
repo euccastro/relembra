@@ -71,7 +71,8 @@
   :reply
   {:extra-deps {reply {:mvn/version "0.4.4"}}
    :main-opts ["-m" "reply.main" "--attach" "1337"]}
+  :kaocha
+  {:extra-deps  {lambdaisland/kaocha {:mvn/version "1.0-612"}}
+   :main-opts   ["-m" "kaocha.runner"]}
   :test
-  {:extra-paths ["test/clj" "test/cljs"]
-   :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0-612"}}
-   :main-opts   ["-m" "kaocha.runner"]}}}
+  {:extra-paths ["test/clj" "test/cljs"]}}}
