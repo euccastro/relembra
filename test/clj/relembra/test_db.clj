@@ -102,7 +102,20 @@
              {:relembra.lembrando/due-date due-date
               :relembra.lembrando/failing? failing?
               :relembra.lembrando/remembering-state remembering-state})
-        lent (crux/entity (crux/db *crux-node*) lid)]
+        lent (crux/entity (crux/db *crux-node*) lid)
+        new-date (t/date "2222-02-02")
+        new-failing? false
+        new-remembering-state [3.0 4.0]
+        new-lent {:crux.db/id lid
+                 :relembra.lembrando/qa qa-id
+                 :relembra.lembrando/due-date new-date
+                 :relembra.lembrando/failing? new-failing?
+                 :relembra.lembrando/remembering-state new-remembering-state}
+        new-lid (db-lmb/update-lembrando
+                 *crux-node*
+                 qa-id
+                 lent
+                 new-lent)]
     (is (nil? pre-lid))
     (is (= lid (db-lmb/qa->lembrando-id *crux-node* qa-id)))
     (throws-ex-info? (db-lmb/update-lembrando
@@ -117,7 +130,10 @@
                  :relembra.lembrando/qa qa-id
                  :relembra.lembrando/due-date due-date
                  :relembra.lembrando/failing? failing?
-                 :relembra.lembrando/remembering-state remembering-state}))))
+                 :relembra.lembrando/remembering-state remembering-state}))
+    (is (= lid new-lid))
+    (is (schema/lembrando? new-lent))
+    (is (= new-lent (crux/entity (crux/db *crux-node*) new-lid)))))
 
 
 (comment
