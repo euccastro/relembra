@@ -4,9 +4,15 @@
             [hashp.core]                ; to enable #p data readers
             [integrant.core :as ig]
             integrant.repl
+            [relembra.data-readers :as data-readers]
             [relembra.db-model.user :as db-user]
             [taoensso.timbre :as timbre :refer [info warn]]
             [taoensso.timbre.tools.logging :refer [use-timbre]]))
+
+
+(defonce ^:private readers-inited
+  (do (data-readers/patch!)
+      true))
 
 
 (defn init-logging [level]

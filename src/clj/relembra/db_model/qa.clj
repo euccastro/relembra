@@ -6,6 +6,13 @@
             [crux.api :as crux]))
 
 
+(defn existing-question? [crux-node user-id question]
+  (some? (q1 crux-node
+             {:find ['qa]
+              :where [['qa :relembra.qa/owner user-id]
+                      ['qa :relembra.qa/question question]]})))
+
+
 (defn add-qa [crux-node user-id question answer]
   (let [id (uuid/v1)
         qa {:crux.db/id id
@@ -17,6 +24,10 @@
       (throw (ex-info "invalid question/answer pair?" {:qa qa}))
       (not (db-user/user-exists? crux-node user-id))
       (throw (ex-info "unknown user?" {:user-id user-id}))
+      (existing-question? crux-node user-id question)
+      (throw (ex-info "question exists for user"
+                      {:question question
+                       :user-id user-id}))
       :else (and (sync-tx crux-node
                           [[:crux.tx/match id nil]
                            [:crux.tx/put qa]])
