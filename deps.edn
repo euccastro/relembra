@@ -22,7 +22,8 @@
         kee-frame {:mvn/version "0.4.0" :exclusions [metosin/reitit-core]}
         markdown-clj {:mvn/version "1.10.5"}
         metosin/muuntaja {:mvn/version "0.6.7"}
-        metosin/reitit {:mvn/version "0.5.6"}
+        metosin/malli {:mvn/version "0.2.1"}
+        metosin/reitit {:mvn/version "0.5.9"}
         metosin/ring-http-response {:mvn/version "0.9.1"}
         miracle-save {:mvn/version "0.0.1"}
         nrepl/nrepl {:mvn/version "0.7.0"}
