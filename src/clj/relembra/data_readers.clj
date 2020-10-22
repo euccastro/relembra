@@ -5,8 +5,8 @@
 
 (defmacro patch! []
   (list* 'do
-         (for [[n f] (ns-publics 'time-literals.data-readers)
-               :let [vs (symbol "time-literals.data-readers" (name n))
+         (for [[sym f] (ns-publics 'time-literals.data-readers)
+               :let [vs (symbol "time-literals.data-readers" (name sym))
                      body (f 'x)]]
            `(alter-var-root (var ~vs) (constantly (fn [~'x] ~body))))))
 
