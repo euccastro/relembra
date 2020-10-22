@@ -13,7 +13,10 @@
 
 (comment
 
+  (time-literals.data-readers/date "2020-08-08")
+
   (macroexpand-1 '(patch!))
 
+  (patch!)
 
   )
