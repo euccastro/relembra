@@ -1,4 +1,4 @@
-(ns relembra.view.review)
+(ns relembra.review)
 
 
 (defn review []

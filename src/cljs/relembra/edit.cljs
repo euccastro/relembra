@@ -1,4 +1,4 @@
-(ns relembra.view.edit-question
+(ns relembra.edit
   (:require [markdown.core :refer [md->html]]
             [re-frame.core :as rf]
             [reagent.dom :as rd]))
@@ -47,7 +47,7 @@
    [mathjax-box val]])
 
 
-(defn edit-question []
+(defn edit []
   [:div
    {:style {:padding "40px"}}
    (doall

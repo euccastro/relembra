@@ -2,7 +2,8 @@
   (:require
    [kee-frame.core :as kf]
    [relembra.transit-util :refer (transit-ajax-response-format)]
-   [relembra.view :as view]
+   [relembra.edit :refer [edit]]
+   [relembra.review :refer [review]]
    [re-frame.core :as rf]))
 
 
@@ -45,10 +46,47 @@
 
 (def routes
   [["/" :review]
-   ["/edit-question" :edit-question]
-   ["/md" :md]
+   ["/edit" :edit]
    ["/not-found" :not-found]])
 
+
+(def page-names
+  [[:review "Review"]
+   [:edit "Edit question"]])
+
+
+(defn not-found []
+  [:div
+   [:h1 "WAT"]
+   [:p "Not found, 404, etc."]])
+
+
+(defn navigation [current-page]
+  [:nav
+   [:ul
+    (for [[page-id page-name] page-names]
+      ^{:key (name page-id)}
+      [:li
+       (if (= current-page page-id)
+         [:strong page-name]
+         [:a {:href (kf/path-for [page-id])}
+          page-name])])]])
+
+
+(defn root []
+  (let [current-page @(rf/subscribe [:nav/page])
+        error @(rf/subscribe [:common/error])]
+    [:div
+     (when error
+       [:div [:pre [:code {:style {:color :red}}
+                    (with-out-str (cljs.pprint/pprint error))]]])
+     [navigation current-page]
+     [:main
+      (case current-page
+        :review [review]
+        :edit [edit]
+        :not-found [not-found]
+        [:div "Loading..."])]]))
 
 (defn ^:after-load mount!
   ([] (mount! true))
@@ -58,7 +96,7 @@
                :routes routes
                :not-found "/not-found"
                :initial-db {}
-               :root-component [view/root]})))
+               :root-component [root]})))
 
 
 (defn init! [debug?]
