@@ -3,12 +3,11 @@
   (:require [time-literals.data-readers]))
 
 
-(defmacro patch! []
-  (list* 'do
-         (for [[sym f] (ns-publics 'time-literals.data-readers)
-               :let [vs (symbol "time-literals.data-readers" (name sym))
-                     body (f 'x)]]
-           `(alter-var-root (var ~vs) (constantly (fn [~'x] ~body))))))
+(defn patch! []
+  (doseq [v (vals (ns-publics 'time-literals.data-readers))]
+    (try
+      (alter-var-root v (constantly (eval `(fn [~'x] ~(@v 'x)))))
+      (catch ClassCastException _ nil))))
 
 
 (comment
