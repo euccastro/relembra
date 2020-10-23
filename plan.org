@@ -16,6 +16,25 @@
       deixa os campos como estam, passa a /edit
 **** nom hai search!
      esperando por lucene. no entanto podo procurar os IDs no repl or something
+**** db model
+***** edit/qa
+      id
+***** edit/question
+      texto
+***** edit/answer
+      texto
+***** evento save
+****** ativo se temos question/answer pair
+******* e se está dirty?
+        bah
+****** ajax request
+******* se isto é um q/a novo, devolve ID
+***** evento clear?
+      apaga question e answer
+***** evento swap
+      swaps question e answer
+***** evento new
+      clears edit/qa
 *** review
     /review (sem mais)
     isto pode ser umha seçom

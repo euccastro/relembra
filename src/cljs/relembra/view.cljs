@@ -1,15 +1,14 @@
 (ns relembra.view
   (:require
+   [cljs.pprint]
    [kee-frame.core :as kf]
    [relembra.view.edit-question :refer [edit-question]]
-   [relembra.view.md :refer [md]]
    [relembra.view.review :refer [review]]
    [re-frame.core :as rf]))
 
 
 (def page-names
   [[:review "Review"]
-   [:md "MD"]
    [:edit-question "Edit question"]])
 
 
@@ -42,7 +41,6 @@
      [:main
       (case current-page
         :review [review]
-        :md [md]
         :edit-question [edit-question]
         :not-found [not-found]
         [:div "Loading..."])]]))
