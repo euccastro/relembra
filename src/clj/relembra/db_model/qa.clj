@@ -13,6 +13,7 @@
                       ['qa :relembra.qa/question question]]})))
 
 
+;; XXX: allow editing existing qa
 (defn add-qa [crux-node user-id question answer]
   (let [id (uuid/v1)
         qa {:crux.db/id id

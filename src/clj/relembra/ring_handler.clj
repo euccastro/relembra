@@ -10,6 +10,7 @@
             [integrant.core :as ig]
             [muuntaja.middleware :refer [wrap-format]]
             [reitit.ring :as rring]
+            [relembra.db-model.qa :as db-qa]
             [relembra.db-model.user :as db-user]
             [ring.middleware.anti-forgery :refer [*anti-forgery-token*
                                                   wrap-anti-forgery]]
@@ -108,6 +109,18 @@
       ;; XXX: set error string in login instead
       (on-error {:uri redirect-to} nil))))
 
+;; XXX allow editing existing qa
+(defn- save-qa-handler [crux-node]
+  (fn save-qa [{{:keys [question answer]} :body-params
+                {user-id :identity} :session
+                :as req}]
+    (println "save-qa called!")
+    (def inner-req req)
+    (let [qa-id (db-qa/add-qa crux-node user-id question answer)]
+      (ok {:id qa-id
+           :question question
+           :answer answer}))))
+
 
 (defn- handler [crux-node]
   (rring/ring-handler
@@ -117,6 +130,7 @@
      [""
       {:middleware [wrap-restricted]}
       ["/initial-data" {:get (constantly (ok {:test/data 42}))}]
+      ["/save-qa" {:post (save-qa-handler crux-node)}]
       ["/test" {:get (constantly {:status 200
                                   :headers {"Content-Type" "text/plain"}
                                   :body "OK"})}]]])
@@ -127,6 +141,10 @@
      (rring/create-default-handler
       {:not-found frontpage})))))
 
+(defn wrap-def [handler]
+  (fn [req]
+    (def original-req req)
+    (handler req)))
 
 (defmethod ig/init-key ::handler
   [_ {:keys [crux-node]}]
@@ -134,7 +152,8 @@
       wrap-auth
       (wrap-anti-forgery
        {:read-token (fn [req]
-                      (get-in req [:params :csrf-token]))})
+                      (or (get-in req [:params :csrf-token])
+                          (get-in req [:body-params :csrf-token])))})
       wrap-session
       wrap-format
       wrap-keyword-params
@@ -147,9 +166,23 @@
     (require '[integrant.repl.state :refer [system]])
     (def crux-node (:relembra.crux/node system)))
 
+  crux-node
+
+  ( (save-qa-handler crux-node)
+   inner-req)
+
+  original-req
+
+  reqreq
+
+  (require '[relembra.crux :as c])
+  (c/q1 crux-node {:find ['qa]
+                   :where [['qa :relembra.qa/owner]]})
   (defn add-user [crux-node name password]
     (db-user/add-user crux-node name (hashers/derive password)))
 
   (add-user crux-node "outro" "senha")
+
+  reqreq
 
   )

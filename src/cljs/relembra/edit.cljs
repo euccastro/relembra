@@ -2,7 +2,9 @@
   (:require [kee-frame.core :as kf]
             [markdown.core :refer [md->html]]
             [re-frame.core :as rf]
-            [reagent.dom :as rd]))
+            [reagent.dom :as rd]
+            [relembra.transit-util :refer (transit-ajax-request-format
+                                           transit-ajax-response-format)]))
 
 
 (rf/reg-event-db
@@ -37,6 +39,23 @@
    {:navigate-to [:edit {:qa (random-uuid)}]}))
 
 
+(kf/reg-chain
+ :edit/save
+ (fn [_ [params]]
+   (println "got params" (pr-str params) js/csrfToken transit-ajax-request-format)
+   {:http-xhrio {:method :post
+                 :uri "/save-qa"
+                 :params (assoc params :csrf-token js/csrfToken)
+                 :format transit-ajax-request-format
+                 :response-format transit-ajax-response-format
+                 :on-failure [:common/set-error]}})
+ (fn [{:keys [db]} [_ {:keys [id question answer]}]]
+   {:db (update-in db [:qa id] assoc
+                   :relembra.qa/question question
+                   :relembra.qa/answer answer)
+    :navigate-to [:edit {:qa id}]}))
+
+
 (defn typeset [c]
   (js/MathJax.Hub.Queue (array "Typeset" js/MathJax.Hub (rd/dom-node c))))
 
@@ -64,18 +83,23 @@
 
 (defn edit [qa]
   (println "editing" (pr-str qa))
-  [:div
-   {:style {:padding "40px"}}
-   (doall
-    (for [id [:edit/question-body :edit/answer-body]]
-      ^{:key id} [qa-pair id @(rf/subscribe [:db/key id])]))
-   [:div
-    {:style {:display :flex}}
-    [:button {:on-click #(rf/dispatch [:edit/clear])}
-     "Clear"]
-    [:button {:on-click #(rf/dispatch [:edit/swap])}
-     "Swap"]
-    [:button {:on-click #(rf/dispatch [:edit/new])}
-     "New"]
-    [:button {:on-click #(rf/dispatch [:edit/save])}
-     "Save"]]])
+  (let [q @(rf/subscribe [:db/key :edit/question-body])
+        a @(rf/subscribe [:db/key :edit/answer-body])]
+    [:div
+     {:style {:padding "40px"}}
+     (doall
+      (for [[id body] [[:edit/question-body q]
+                       [:edit/answer-body a]]]
+        ^{:key id} [qa-pair id body]))
+     [:div
+      {:style {:display :flex}}
+      [:button {:on-click #(rf/dispatch [:edit/clear])}
+       "Clear"]
+      [:button {:on-click #(rf/dispatch [:edit/swap])}
+       "Swap"]
+      [:button {:on-click #(rf/dispatch [:edit/new])}
+       "New"]
+      [:button {:on-click #(rf/dispatch [:edit/save
+                                         {:question q
+                                          :answer a}])}
+       "Save"]]]))

@@ -1,13 +1,11 @@
 (ns ^:figwheel-hooks relembra.core
-  (:require
-   [kee-frame.core :as kf]
-   [relembra.transit-util :refer (transit-ajax-response-format)]
-   [relembra.edit :refer [edit]]
-   [relembra.review :refer [review]]
-   [re-frame.core :as rf]))
+  (:require [kee-frame.core :as kf]
+            [re-frame.core :as rf]
+            [relembra.edit :refer [edit]]
+            [relembra.review :refer [review]]
+            [relembra.transit-util :refer (transit-ajax-response-format)]))
 
 
-;; XXX: handle failure
 (kf/reg-chain
  ::load-initial-data
  (fn [_ _]
