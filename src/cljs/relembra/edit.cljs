@@ -39,21 +39,39 @@
    {:navigate-to [:edit {:qa (random-uuid)}]}))
 
 
+(defn- update-qa [db qa]
+  (assoc-in db [:qa (:crux.db/id qa)]
+            (select-keys qa [:crux.db/id :relembra.qa/question :relembra.qa/answer])))
+
+
 (kf/reg-chain
- :edit/save
+ :edit/add
  (fn [_ [params]]
-   (println "got params" (pr-str params) js/csrfToken transit-ajax-request-format)
    {:http-xhrio {:method :post
-                 :uri "/save-qa"
+                 :uri "/qa"
                  :params (assoc params :csrf-token js/csrfToken)
                  :format transit-ajax-request-format
                  :response-format transit-ajax-response-format
                  :on-failure [:common/set-error]}})
- (fn [{:keys [db]} [_ {:keys [id question answer]}]]
-   {:db (update-in db [:qa id] assoc
-                   :relembra.qa/question question
-                   :relembra.qa/answer answer)
+ (fn [{:keys [db]} [_ {:keys [crux.db/id] :as ret}]]
+   {:db (update-qa db ret)
     :navigate-to [:edit {:qa id}]}))
+
+
+(kf/reg-chain
+ :edit/update
+ (fn [_ [params]]
+   {:http-xhrio {:method :put
+                 :uri "/qa"
+                 :params (assoc params :csrf-token js/csrfToken)
+                 :format transit-ajax-request-format
+                 :response-format transit-ajax-response-format
+                 :on-failure [:common/set-error]}})
+ (fn [{:keys [db]} [_ {:keys [status new]}]]
+   {:db
+    (if (= status :success)
+      (update-qa db new)
+      (assoc db :common/set-error "Should refresh now!"))}))
 
 
 (defn typeset [c]
@@ -81,10 +99,10 @@
    [mathjax-box val]])
 
 
-(defn edit [qa]
-  (println "editing" (pr-str qa))
-  (let [q @(rf/subscribe [:db/key :edit/question-body])
-        a @(rf/subscribe [:db/key :edit/answer-body])]
+(defn edit [qa-id]
+  (let [q @(rf/subscribe [:db/path [:edit/question-body]])
+        a @(rf/subscribe [:db/path [:edit/answer-body]])
+        saved-qa (and qa-id @(rf/subscribe [:db/path [:qa qa-id]]))]
     [:div
      {:style {:padding "40px"}}
      (doall
@@ -99,7 +117,12 @@
        "Swap"]
       [:button {:on-click #(rf/dispatch [:edit/new])}
        "New"]
-      [:button {:on-click #(rf/dispatch [:edit/save
-                                         {:question q
-                                          :answer a}])}
+      [:button {:on-click #(rf/dispatch
+                            (let [new-qa {:crux.db/id qa-id
+                                          :relembra.qa/question q
+                                          :relembra.qa/answer a}]
+                              (if qa-id
+                                [:edit/update
+                                 {:old saved-qa :new new-qa}]
+                                [:edit/add (dissoc new-qa :crux.db/id)])))}
        "Save"]]]))

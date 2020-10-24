@@ -49,9 +49,9 @@
 
 
 (rf/reg-sub
- :db/key
- (fn [db [_ k]]
-   (k db)))
+ :db/path
+ (fn [db [_ path]]
+   (get-in db path)))
 
 
 (def routes
@@ -99,8 +99,8 @@
 
 (defn root []
   (let [current-page @(rf/subscribe [:nav/page])
-        qa @(rf/subscribe [:db/key :edit/qa])
-        error @(rf/subscribe [:db/key :common/error])]
+        qa @(rf/subscribe [:db/path [:edit/qa]])
+        error @(rf/subscribe [:db/path [:common/error]])]
     [:div
      (when error
        [:div [:pre [:code {:style {:color :red}}

@@ -110,18 +110,40 @@
       ;; XXX: set error string in login instead
       (on-error {:uri redirect-to} nil))))
 
-;; XXX allow editing existing qa
-(defn- save-qa-handler [crux-node]
-  (fn save-qa [{{:keys [question answer]} :body-params
+
+
+(defn- add-qa-handler [crux-node]
+  (fn add-qa [{{:keys [relembra.qa/question
+                        relembra.qa/answer]} :body-params
                 {user-id :identity} :session
                 :as req}]
-    (println "save-qa called!")
+    (println "add-qa called!")
     (def inner-req req)
     (try
       (let [qa-id (db-qa/add-qa crux-node user-id question answer)]
-        (ok {:id qa-id
-             :question question
-             :answer answer}))
+        (ok {:crux.db/id qa-id
+             :relembra.qa/question question
+             :relembra.qa/answer answer}))
+      (catch clojure.lang.ExceptionInfo e
+        (print-stack-trace e)
+        {:status 400
+         :body {:error (.getMessage e)
+                :err-data (ex-data e)}}))))
+
+
+(defn- update-qa-handler [crux-node]
+  (fn update-qa [{{:keys [old new]} :body-params
+                  {user-id :identity} :session
+                  :as req}]
+    (println "update-qa called!")
+    (def inner-req req)
+    (try
+      (if (db-qa/update-qa crux-node
+                           (assoc old :relembra.qa/owner user-id)
+                           (assoc new :relembra.qa/owner user-id))
+        (ok {:status :success
+             :new new})
+        (ok {:status :failure}))
       (catch clojure.lang.ExceptionInfo e
         (print-stack-trace e)
         {:status 400
@@ -137,7 +159,8 @@
      [""
       {:middleware [wrap-restricted]}
       ["/initial-data" {:get (constantly (ok {:test/data 42}))}]
-      ["/save-qa" {:post (save-qa-handler crux-node)}]
+      ["/qa" {:post (add-qa-handler crux-node)
+              :put (update-qa-handler crux-node)}]
       ["/test" {:get (constantly {:status 200
                                   :headers {"Content-Type" "text/plain"}
                                   :body "OK"})}]]])
@@ -148,10 +171,12 @@
      (rring/create-default-handler
       {:not-found frontpage})))))
 
+
 (defn wrap-def [handler]
   (fn [req]
     (def original-req req)
     (handler req)))
+
 
 (defmethod ig/init-key ::handler
   [_ {:keys [crux-node]}]
