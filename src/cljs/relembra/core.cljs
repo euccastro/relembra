@@ -38,8 +38,20 @@
    (assoc db :common/error error)))
 
 
+(rf/reg-event-db
+ :db/set-key
+ (fn [db [_ k v]]
+   (assoc db k v)))
+
+
+(rf/reg-event-db
+ :db/del-key
+ (fn [db [_ k]]
+   (dissoc db k)))
+
+
 (rf/reg-sub
- :top-level-key
+ :db/key
  (fn [db [_ k]]
    (k db)))
 
@@ -61,6 +73,18 @@
    [:p "Not found, 404, etc."]])
 
 
+(kf/reg-controller
+ :edit
+ {:params (fn [{:keys [path-params]
+                {:keys [name]} :data}]
+            (when (= name :edit)
+              (:qa path-params)))
+  :start (fn [_ id]
+           (if (= id "new")
+             [:db/del-key :edit/qa]
+             [:db/set-key :edit/qa (uuid id)]))})
+
+
 (defn navigation [current-page qa]
   [:nav
    [:ul
@@ -69,24 +93,28 @@
       [:li
        (if (= current-page page-id)
          [:strong page-name]
-         [:a {:href (kf/path-for [page-id])}
+         [:a {:href (kf/path-for
+                     (cond-> [page-id]
+                       (= page-id :edit) (conj {:qa (or qa :new)})))}
           page-name])])]])
 
 
 (defn root []
   (let [current-page @(rf/subscribe [:nav/page])
-        error @(rf/subscribe [:top-level-key :common/error])]
+        qa @(rf/subscribe [:db/key :edit/qa])
+        error @(rf/subscribe [:db/key :common/error])]
     [:div
      (when error
        [:div [:pre [:code {:style {:color :red}}
                     (with-out-str (cljs.pprint/pprint error))]]])
-     [navigation current-page]
+     [navigation current-page qa]
      [:main
       (case current-page
         :review [review]
-        :edit [edit]
+        :edit [edit qa]
         :not-found [not-found]
         [:div "Loading..."])]]))
+
 
 (defn ^:after-load mount!
   ([] (mount! true))

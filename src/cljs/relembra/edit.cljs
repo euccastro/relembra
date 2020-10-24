@@ -25,6 +25,16 @@
           :edit/answer-body question-body)))
 
 
+(rf/reg-event-fx
+ :edit/new
+ (fn [& _]
+   {:navigate-to [:edit {:qa :new}]}))
+
+
+(rf/reg-event-fx
+ :edit/save
+ (fn [& _]
+   {:navigate-to [:edit {:qa (random-uuid)}]}))
 
 
 (defn typeset [c]
@@ -52,13 +62,20 @@
    [mathjax-box val]])
 
 
-(defn edit []
+(defn edit [qa]
+  (println "editing" (pr-str qa))
   [:div
    {:style {:padding "40px"}}
    (doall
     (for [id [:edit/question-body :edit/answer-body]]
-      ^{:key id} [qa-pair id @(rf/subscribe [:top-level-key id])]))
+      ^{:key id} [qa-pair id @(rf/subscribe [:db/key id])]))
+   [:div
+    {:style {:display :flex}}
     [:button {:on-click #(rf/dispatch [:edit/clear])}
      "Clear"]
     [:button {:on-click #(rf/dispatch [:edit/swap])}
      "Swap"]
+    [:button {:on-click #(rf/dispatch [:edit/new])}
+     "New"]
+    [:button {:on-click #(rf/dispatch [:edit/save])}
+     "Save"]]])
