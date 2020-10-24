@@ -5,6 +5,7 @@
             [buddy.auth.backends.session :refer [session-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [buddy.hashers :as hashers]
+            [clojure.stacktrace :refer [print-stack-trace]]
             [hiccup.core :refer [html]]
             [hiccup.page :refer [doctype]]
             [integrant.core :as ig]
@@ -116,10 +117,16 @@
                 :as req}]
     (println "save-qa called!")
     (def inner-req req)
-    (let [qa-id (db-qa/add-qa crux-node user-id question answer)]
-      (ok {:id qa-id
-           :question question
-           :answer answer}))))
+    (try
+      (let [qa-id (db-qa/add-qa crux-node user-id question answer)]
+        (ok {:id qa-id
+             :question question
+             :answer answer}))
+      (catch clojure.lang.ExceptionInfo e
+        (print-stack-trace e)
+        {:status 400
+         :body {:error (.getMessage e)
+                :err-data (ex-data e)}}))))
 
 
 (defn- handler [crux-node]

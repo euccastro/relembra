@@ -3,14 +3,15 @@
             [relembra.crux :refer [q1 sync-tx]]
             [relembra.db-model.user :as db-user]
             [relembra.schema :refer [qa?]]
-            [crux.api :as crux]))
+            [crux.api :as crux]
+            [better-cond.core :as b]))
 
 
-(defn existing-question? [crux-node user-id question]
-  (some? (q1 crux-node
-             {:find ['qa]
-              :where [['qa :relembra.qa/owner user-id]
-                      ['qa :relembra.qa/question question]]})))
+(defn existing-question [crux-node user-id question]
+  (q1 crux-node
+      {:find ['qa]
+       :where [['qa :relembra.qa/owner user-id]
+               ['qa :relembra.qa/question question]]}))
 
 
 ;; XXX: allow editing existing qa
@@ -20,19 +21,45 @@
             :relembra.qa/owner user-id
             :relembra.qa/question question
             :relembra.qa/answer answer}]
-    (cond
+    (b/cond
       (not (qa? qa))
       (throw (ex-info "invalid question/answer pair?" {:qa qa}))
       (not (db-user/user-exists? crux-node user-id))
       (throw (ex-info "unknown user?" {:user-id user-id}))
-      (existing-question? crux-node user-id question)
+      :let [eq (existing-question crux-node user-id question)]
+      eq
       (throw (ex-info "question exists for user"
                       {:question question
+                       :existing-qa eq
                        :user-id user-id}))
       :else (and (sync-tx crux-node
                           [[:crux.tx/match id nil]
                            [:crux.tx/put qa]])
                  id))))
+
+
+(defn edit-qa [crux-node
+               old
+               {:keys [relembra.qa/owner
+                       relembra.qa/question
+                       crux.db/id] :as new}]
+  (let [eq (existing-question crux-node owner question)]
+    (cond
+      (not (qa? old))
+      (throw (ex-info "bad old question/answer pair:"
+                      {:old-qa old}))
+      (not (qa? new))
+      (throw (ex-info "bad new question/answer pair:"
+                      {:new-qa new}))
+      (and eq (not= eq id))
+      (throw (ex-info "question exists for user"
+                      {:question question
+                       :existing-qa eq
+                       :user-id owner}))
+      :else
+      (sync-tx crux-node
+               [[:crux.tx/match id old]
+                [:crux.tx/put new]]))))
 
 
 (defn qa-exists? [crux-node qa-id]
@@ -53,6 +80,7 @@
     (require '[integrant.repl.state :refer [system]])
     (def crux-node (:relembra.crux/node system)))
 
+  (def ent (crux/entity (crux/db crux-node) :not-there))
   (def uid (db-user/get-user-id crux-node "es"))
 
   (add-qa crux-node uid "que?" "pois")
@@ -71,6 +99,10 @@
   (def e (crux/entity (crux/db crux-node) id))
 
   (qa? e)
+
+  (type (ex-info "blah" {:x 1}))
+
+  clojure.lang.ExceptionInfo
 
   (qa-exists? crux-node id)
   (qa-exists? crux-node (uuid/v1))

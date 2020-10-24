@@ -56,7 +56,7 @@
   (db-user/add-user *crux-node* "test-user-name" "hashed-password"))
 
 
-(deftest qa
+(deftest add-qa
   (let [user-id (add-test-user)
         q "what?"
         a "this"
@@ -86,6 +86,35 @@
      :q q
      :a a
      :qa-id (db-qa/add-qa *crux-node* uid q a)}))
+
+
+(deftest edit-qa
+  (let [{:keys [qa-id q a user-id]} (add-test-qa)
+        existing-q "so what, again?"
+        old-ent {:crux.db/id qa-id
+                 :relembra.qa/owner user-id
+                 :relembra.qa/question q
+                 :relembra.qa/answer a}
+        new-ent (assoc old-ent
+                       :relembra.qa/question "some other question"
+                       :relembra.qa/answer "some other answer")]
+    ((db-qa/add-qa *crux-node* user-id existing-q a))
+    (throws-ex-info?
+     (db-qa/edit-qa *crux-node*
+                    (dissoc old-ent :relembra.qa/owner)
+                    new-ent))
+    (throws-ex-info?
+     (db-qa/edit-qa *crux-node*
+                    old-ent
+                    (dissoc new-ent :relembra.qa/owner)))
+    (throws-ex-info?
+     (db-qa/edit-qa *crux-node*
+                    old-ent
+                    (assoc new-ent :relembra.qa/question existing-q)))
+    (is (not (db-qa/edit-qa *crux-node* new-ent new-ent)))
+    (is (db-qa/edit-qa *crux-node* old-ent new-ent))
+    (is (not (db-qa/edit-qa *crux-node* old-ent new-ent)))
+    ))
 
 
 (deftest lembrando

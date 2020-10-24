@@ -1,5 +1,6 @@
 * stack
 ** edit existing q/a pair
+** clean errors
 ** ui design
 *** edit
 **** add question/answer
