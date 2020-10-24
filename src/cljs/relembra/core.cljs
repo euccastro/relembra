@@ -39,9 +39,9 @@
 
 
 (rf/reg-sub
- :common/error
- (fn [db _]
-   (:common/error db)))
+ :top-level-key
+ (fn [db [_ k]]
+   (k db)))
 
 
 (def routes
@@ -75,7 +75,7 @@
 
 (defn root []
   (let [current-page @(rf/subscribe [:nav/page])
-        error @(rf/subscribe [:common/error])]
+        error @(rf/subscribe [:top-level-key :common/error])]
     [:div
      (when error
        [:div [:pre [:code {:style {:color :red}}

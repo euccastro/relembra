@@ -10,16 +10,9 @@
    (assoc db id val)))
 
 
-(rf/reg-sub
- :edit/question-body
  (fn [db _]
-   (:edit/question-body db)))
 
 
-(rf/reg-sub
- :edit/answer-body
- (fn [db _]
-   (:edit/answer-body db)))
 
 
 (defn typeset [c]
@@ -52,4 +45,4 @@
    {:style {:padding "40px"}}
    (doall
     (for [id [:edit/question-body :edit/answer-body]]
-      ^{:key id} [qa-pair id @(rf/subscribe [id])]))])
+      ^{:key id} [qa-pair id @(rf/subscribe [:top-level-key id])]))
