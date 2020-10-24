@@ -1,5 +1,6 @@
 (ns relembra.edit
-  (:require [markdown.core :refer [md->html]]
+  (:require [kee-frame.core :as kf]
+            [markdown.core :refer [md->html]]
             [re-frame.core :as rf]
             [reagent.dom :as rd]))
 
@@ -10,7 +11,18 @@
    (assoc db id val)))
 
 
+(rf/reg-event-db
+ :edit/clear
  (fn [db _]
+   (dissoc db :edit/question-body :edit/answer-body)))
+
+
+(rf/reg-event-db
+ :edit/swap
+ (fn [{:keys [edit/question-body edit/answer-body] :as db} _]
+   (assoc db
+          :edit/question-body answer-body
+          :edit/answer-body question-body)))
 
 
 
@@ -46,3 +58,7 @@
    (doall
     (for [id [:edit/question-body :edit/answer-body]]
       ^{:key id} [qa-pair id @(rf/subscribe [:top-level-key id])]))
+    [:button {:on-click #(rf/dispatch [:edit/clear])}
+     "Clear"]
+    [:button {:on-click #(rf/dispatch [:edit/swap])}
+     "Swap"]

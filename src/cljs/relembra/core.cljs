@@ -46,7 +46,7 @@
 
 (def routes
   [["/" :review]
-   ["/edit" :edit]
+   ["/edit/:qa" :edit]
    ["/not-found" :not-found]])
 
 
@@ -61,7 +61,7 @@
    [:p "Not found, 404, etc."]])
 
 
-(defn navigation [current-page]
+(defn navigation [current-page qa]
   [:nav
    [:ul
     (for [[page-id page-name] page-names]
