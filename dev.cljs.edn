@@ -6,4 +6,4 @@
  :optimizations :none
  :output-to "alias/dev/target/public/js/relembra.js"
  :output-dir "alias/dev/target/public/js/dev"
- :asset-path "js/dev"}
+ :asset-path "/js/dev"}
