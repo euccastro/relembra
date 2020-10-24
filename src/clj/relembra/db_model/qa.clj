@@ -38,7 +38,7 @@
                  id))))
 
 
-(defn edit-qa [crux-node
+(defn update-qa [crux-node
                old
                {:keys [relembra.qa/owner
                        relembra.qa/question

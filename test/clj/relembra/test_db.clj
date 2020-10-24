@@ -88,7 +88,7 @@
      :qa-id (db-qa/add-qa *crux-node* uid q a)}))
 
 
-(deftest edit-qa
+(deftest update-qa
   (let [{:keys [qa-id q a user-id]} (add-test-qa)
         existing-q "so what, again?"
         old-ent {:crux.db/id qa-id
@@ -98,22 +98,22 @@
         new-ent (assoc old-ent
                        :relembra.qa/question "some other question"
                        :relembra.qa/answer "some other answer")]
-    ((db-qa/add-qa *crux-node* user-id existing-q a))
+    (db-qa/add-qa *crux-node* user-id existing-q a)
     (throws-ex-info?
-     (db-qa/edit-qa *crux-node*
+     (db-qa/update-qa *crux-node*
                     (dissoc old-ent :relembra.qa/owner)
                     new-ent))
     (throws-ex-info?
-     (db-qa/edit-qa *crux-node*
+     (db-qa/update-qa *crux-node*
                     old-ent
                     (dissoc new-ent :relembra.qa/owner)))
     (throws-ex-info?
-     (db-qa/edit-qa *crux-node*
+     (db-qa/update-qa *crux-node*
                     old-ent
                     (assoc new-ent :relembra.qa/question existing-q)))
-    (is (not (db-qa/edit-qa *crux-node* new-ent new-ent)))
-    (is (db-qa/edit-qa *crux-node* old-ent new-ent))
-    (is (not (db-qa/edit-qa *crux-node* old-ent new-ent)))
+    (is (not (db-qa/update-qa *crux-node* new-ent new-ent)))
+    (is (db-qa/update-qa *crux-node* old-ent new-ent))
+    (is (not (db-qa/update-qa *crux-node* old-ent new-ent)))
     ))
 
 
