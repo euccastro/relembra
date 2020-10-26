@@ -39,7 +39,7 @@
    [:relembra.lembrando/qa uuid?]
    [:relembra.lembrando/due-date date?]
    [:relembra.lembrando/failing? boolean?]
-   [:relembra.lembrando/remembering-state [:vector double?]]])
+   [:relembra.lembrando/remembering-state {:optional true} [:vector double?]]])
 (def lembrando?
   (m/validator lembrando {:registry registry}))
 

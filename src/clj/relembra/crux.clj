@@ -59,9 +59,39 @@
 
 (comment
 
-  (require '[integrant.repl.state :refer (system)])
+  (do
+    (require '[integrant.repl.state :refer (system)])
+    (require '[tick.alpha.api :as t])
 
-  (def crux-node (:relembra.crux/node system))
+    ;; the chicago 7
+
+    (def crux-node (:relembra.crux/node system)))
+
+  (def d1 (t/date "2020-08-01"))
+  (def d2 (t/date "2020-10-01"))
+
+  (t/< d1 d2)
+
+  (def crux-node (crux/start-node {}))
+
+
+  (sync-tx crux-node [[:crux.tx/put {:crux.db/id :a :neym "a"}]
+                      [:crux.tx/put {:crux.db/id :b :neym "b"}]
+                      [:crux.tx/put {:crux.db/id :c :neym "c"}]
+                      [:crux.tx/put {:crux.db/id :e :ref :a :t (t/date "2020-10-01")}]
+                      [:crux.tx/put {:crux.db/id :f :ref :b :t (t/date "2022-10-01")}]])
+
+  (crux/q (crux/db crux-node)
+          {:find ['who]
+           :where '[[who :name]
+                    (not [who :surname])]})
+
+
+  (def d (t/date "2020-09-01"))
+  (crux/q (crux/db crux-node)
+          {:find ['x]
+           :where '[[x :neym]
+                    (not [_ :ref x])]})
 
   (crux/q (crux/db crux-node) {:find ['k] :where [['k :crux.db/fn]]})
 

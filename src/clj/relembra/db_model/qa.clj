@@ -1,10 +1,11 @@
 (ns relembra.db-model.qa
-  (:require [clj-uuid :as uuid]
+  (:require [better-cond.core :as b]
+            [clj-uuid :as uuid]
+            [crux.api :as crux]
             [relembra.crux :refer [q1 sync-tx]]
             [relembra.db-model.user :as db-user]
-            [relembra.schema :refer [qa?]]
-            [crux.api :as crux]
-            [better-cond.core :as b]))
+            [relembra.schema :refer [qa? lembrando?]]
+            [tick.alpha.api :as t]))
 
 
 (defn existing-question [crux-node user-id question]
@@ -12,6 +13,16 @@
       {:find ['qa]
        :where [['qa :relembra.qa/owner user-id]
                ['qa :relembra.qa/question question]]}))
+
+
+(defn initial-lembrando [qa-id]
+  {:crux.db/id (uuid/v1)
+   :relembra.lembrando/qa qa-id
+   :relembra.lembrando/due-date (t/today)
+   :relembra.lembrando/failing? false
+   ;; No initial :relembra.lembrando/remembering-state since the representation
+   ;; of this is private to the spaced-repetition library.
+   })
 
 
 ;; XXX: allow editing existing qa
@@ -34,7 +45,8 @@
                        :user-id user-id}))
       :else (and (sync-tx crux-node
                           [[:crux.tx/match id nil]
-                           [:crux.tx/put qa]])
+                           [:crux.tx/put qa]
+                           [:crux.tx/put (initial-lembrando id)]])
                  id))))
 
 
@@ -45,9 +57,6 @@
                        crux.db/id] :as new}]
   (let [eq (existing-question crux-node owner question)]
     (cond
-      (not (qa? old))
-      (throw (ex-info "bad old question/answer pair:"
-                      {:old-qa old}))
       (not (qa? new))
       (throw (ex-info "bad new question/answer pair:"
                       {:new-qa new}))
@@ -74,8 +83,24 @@
     (throw (ex-info "unknown question/answer pair?" {:qa qa}))))
 
 
+(defn qa->lembrando-id [crux-node qa]
+  (q1 crux-node
+      {:find ['l]
+       :where [['l :relembra.lembrando/qa qa]]}))
+
+
+(defn update-lembrando [crux-node old {:keys [crux.db/id]
+                                       :as new}]
+  (cond
+    (not (lembrando? new))
+    (throw (ex-info "invalid lembrando" {:lembrando new}))
+    :else (sync-tx crux-node
+                   [[:crux.tx/match id old]
+                    [:crux.tx/put new]])))
+
 (comment
 
+  (t/today)
   (do
     (require '[integrant.repl.state :refer [system]])
     (def crux-node (:relembra.crux/node system)))

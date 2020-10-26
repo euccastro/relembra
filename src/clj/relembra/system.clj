@@ -19,9 +19,9 @@
   (add-tap (bound-fn* clojure.pprint/pprint))
   (use-timbre)
   (timbre/swap-config!
-   assoc :ns-log-level
-   [["relembra.*" level]
-    ["*" :info]]))
+   assoc :min-level
+   [[#{"relembra.*"} level]
+    [#{"*"} :info]]))
 
 
 (defn hotload-dep
