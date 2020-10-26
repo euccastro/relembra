@@ -1,22 +1,11 @@
 * stack
-
+** initial query devolve todos os qas correspondentes a due lembrandos
 ** ui design
-*** edit
-**** add question/answer
-***** botom save
-****** obtenho qa-id e passa a ser /edit/qa-id
-**** comum
-***** botom save
-      persiste as mudanças
-**** nom hai search!
-     esperando por lucene. no entanto podo procurar os IDs no repl or something
-**** db model
-***** evento save
-****** ajax request
-******* se isto é um q/a novo, devolve ID
 *** review
     /review (sem mais)
-    isto pode ser umha seçom
+    summary do que queda; ligaçom a começar (/review/<primeiro>)
+    quando acabo co primeiro, miro no DB o que resta e (/review/<primeiro>) na
+    nova DB?
 ** repetition spacing
 *** make sense of sm5
 **** single call: sm5/next-state
