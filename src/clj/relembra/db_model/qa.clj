@@ -98,18 +98,40 @@
                    [[:crux.tx/match id old]
                     [:crux.tx/put new]])))
 
+
+(defn due-questions [crux-node user-id]
+  (->> (crux/q (crux/db crux-node)
+               {:find '[(eql/project qa-id [*])]
+                :where '[[qa-id :relembra.qa/owner user-id]
+                         [lid :relembra.lembrando/qa qa-id]
+                         [lid :relembra.lembrando/due-date d]
+                         [(tick.alpha.api/<= d today)]]
+                :args [{'user-id user-id
+                        'today (t/today)}]})
+       (map first)
+       set))
+
 (comment
 
   (t/today)
   (do
-    (require '[integrant.repl.state :refer [system]])
-    (def crux-node (:relembra.crux/node system)))
+    (require '[crux.api :as crux])
+    (require '[relembra.db-model.user :as db-user])
+    (def crux-node (crux/start-node {})))
 
-  (def ent (crux/entity (crux/db crux-node) :not-there))
-  (def uid (db-user/get-user-id crux-node "es"))
 
-  (add-qa crux-node uid "que?" "pois")
+  (def uid (db-user/add-user crux-node "es" "hp"))
+  (def qa1 (add-qa crux-node uid "que?" "pois"))
+  (def qa2 (add-qa crux-node uid "que que?" "pois pois"))
 
+  (due-questions crux-node uid)
+
+  (def old-l2 (crux/entity (crux/db crux-node) (qa->lembrando-id crux-node qa2)))
+  (update-lembrando crux-node
+                    old-l2
+                    (assoc old-l2 :relembra.lembrando/due-date (t/date "2222-01-01")))
+
+  (due-questions crux-node uid)
   ;; throws "unknown user"
   (add-qa crux-node (uuid/v1) "ha?" "já")
 

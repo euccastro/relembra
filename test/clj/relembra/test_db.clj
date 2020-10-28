@@ -160,7 +160,25 @@
     (is (= new-expected-lent new-actual-lent))))
 
 
+(deftest due-questions
+  (let [{:keys [user-id qa-id]} (add-test-qa)
+        qa2-id (db-qa/add-qa *crux-node* user-id "wat wat?" "yes yes")
+        lent2 (crux/entity (crux/db *crux-node*) (db-qa/qa->lembrando-id *crux-node* qa2-id))
+        qa3-id (db-qa/add-qa *crux-node* user-id "o rly" "you bet!")
+        lent3 (crux/entity (crux/db *crux-node*) (db-qa/qa->lembrando-id *crux-node* qa3-id))]
+    (db-qa/update-lembrando *crux-node*
+                            lent2
+                            (assoc lent2 :relembra.lembrando/due-date (t/yesterday)))
+    (db-qa/update-lembrando *crux-node*
+                            lent3
+                            (assoc lent3 :relembra.lembrando/due-date (t/tomorrow)))
+    ;; yesterday's and today's questions are included, but not tomorrow's
+    (is (= #{(crux/entity (crux/db *crux-node*) qa-id)
+             (crux/entity (crux/db *crux-node*) qa2-id)}
+           (db-qa/due-questions *crux-node* user-id)))))
+
 (comment
+  (t/yesterday)
 
   (def lent {:relembra.lembrando/due-date
              (. java.time.LocalDate parse "2020-10-18"),
