@@ -118,7 +118,6 @@
 
 (deftest lembrando
   (let [{:keys [qa-id]} (add-test-qa)
-        other-qa-id (uuid/v1)
         due-date (t/date)
         failing? true
         remembering-state [1.0 2.0]
